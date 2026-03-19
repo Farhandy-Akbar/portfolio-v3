@@ -1,6 +1,7 @@
 "use client";
 
 import { ExternalLink, ArrowRight } from "lucide-react";
+import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 
 const experience = [
   { company: "Treefin", role: "Product Designer", period: "Present", bg: "#ea580c", letter: "T" },
@@ -17,6 +18,78 @@ function slugify(s: string) {
 
 function Divider() {
   return <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "0 52px" }} />;
+}
+
+function NavItem({ children, href, active, isWork, external }: { children: React.ReactNode, href: string, active?: boolean, isWork?: boolean, external?: boolean }) {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
+
+  return (
+    <motion.a
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
+      onMouseMove={handleMouseMove}
+      initial="initial"
+      whileHover="hover"
+      whileTap={{ scale: 0.98 }}
+      style={{
+        position: "relative",
+        fontSize: isWork ? "12px" : "13px",
+        color: active ? "#e5e5e5" : "#888",
+        padding: isWork ? "7px 8px 7px 14px" : "8px 10px",
+        borderRadius: "6px",
+        textDecoration: "none",
+        fontWeight: active ? 500 : 400,
+        marginBottom: isWork ? "1px" : "3px",
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        background: active ? "rgba(255,255,255,0.06)" : "transparent",
+      }}
+    >
+      <motion.div
+        variants={{
+          initial: { opacity: 0 },
+          hover: { opacity: 1 },
+        }}
+        transition={{ duration: 0.3 }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: useMotionTemplate`radial-gradient(100px circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.08), transparent 80%)`,
+          zIndex: 0,
+        }}
+      />
+      <motion.div
+        variants={{
+          initial: { x: 0, color: active ? "#e5e5e5" : "#888" },
+          hover: { x: 4, color: "#fff" }
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: "6px" }}
+      >
+        {children}
+      </motion.div>
+      <motion.div
+        variants={{
+          initial: { opacity: 0, x: -10, scale: 0.8 },
+          hover: { opacity: 1, x: 0, scale: 1 }
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", color: "#666" }}
+      >
+        {external ? <ExternalLink size={12} strokeWidth={2} /> : <ArrowRight size={12} strokeWidth={2} />}
+      </motion.div>
+    </motion.a>
+  );
 }
 
 function WorkSection({
@@ -143,34 +216,31 @@ export default function Home() {
         </div>
 
         <nav style={{ padding: "0 6px", display: "flex", flexDirection: "column", gap: "1px", flex: 1 }}>
-          <a href="#" style={{ fontSize: "13px", color: "#e5e5e5", padding: "6px 8px", borderRadius: "5px", textDecoration: "none", background: "rgba(255,255,255,0.07)", fontWeight: 500, marginBottom: "4px" }}>
+          <NavItem href="#" active>
             Home
-          </a>
+          </NavItem>
 
-          <span style={{ fontSize: "10px", color: "#383838", padding: "8px 8px 2px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
+          <span style={{ fontSize: "10px", color: "#444", padding: "12px 10px 4px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
             Work
           </span>
 
           {workNav.map(name => (
-            <a key={name} href={`#${slugify(name)}`}
-              style={{ fontSize: "12px", color: "#484848", padding: "5px 8px 5px 14px", borderRadius: "5px", textDecoration: "none" }}>
+            <NavItem key={name} href={`#${slugify(name)}`} isWork>
               {name}
-            </a>
+            </NavItem>
           ))}
 
-          <div style={{ height: "10px" }} />
+          <div style={{ height: "14px" }} />
 
           {["About", "Brief"].map(name => (
-            <a key={name} href="#"
-              style={{ fontSize: "13px", color: "#484848", padding: "6px 8px", borderRadius: "5px", textDecoration: "none" }}>
+            <NavItem key={name} href="#">
               {name}
-            </a>
+            </NavItem>
           ))}
 
-          <a href="https://linkedin.com/in/georgekim" target="_blank" rel="noreferrer"
-            style={{ fontSize: "13px", color: "#484848", padding: "6px 8px", borderRadius: "5px", textDecoration: "none", display: "flex", alignItems: "center", gap: "4px" }}>
-            LinkedIn <ExternalLink size={10} strokeWidth={1.5} />
-          </a>
+          <NavItem href="https://linkedin.com/in/georgekim" external>
+            LinkedIn
+          </NavItem>
         </nav>
       </aside>
 
