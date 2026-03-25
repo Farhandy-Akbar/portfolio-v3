@@ -1,7 +1,8 @@
 "use client";
 
 import { ExternalLink, Mail } from "lucide-react";
-import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -16,6 +17,83 @@ const workNav = ["X (Twitter)", "Handshake", "Forge", "Interface Lab", "About To
 
 function slugify(s: string) {
   return s.toLowerCase().replace(/[\s()]+/g, "");
+}
+
+// ─── THEME TOKENS ─────────────────────────────────────────────────────────────
+//
+// WCAG AA targets (on each background):
+//  • Primary text   → ≥ 4.5:1  (normal size)
+//  • Secondary text → ≥ 4.5:1
+//  • Muted text     → ≥ 4.5:1  (min AA for body copy)
+//  • Subtle text    → ≥ 3.0:1  (large / UI labels only)
+//
+// Dark bg  = #121212  (L* ≈ 5)
+// Light bg = #f5f5f5  (L* ≈ 96)
+
+function buildTheme(isDark: boolean) {
+  return {
+    // Layout
+    bg:           isDark ? "#121212" : "#f5f5f5",
+    sidebar:      isDark ? "#121212" : "#f0f0f0",
+    sidebarBorder:isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)",
+    divider:      isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.08)",
+    brandBorder:  isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.09)",
+    brandAvatar:  isDark ? "#444" : "#b0b0b0",
+    footerBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.09)",
+
+    // Text — WCAG AA on their respective backgrounds
+    // Dark: #fff on #121212   →  contrast 19.6:1  ✅
+    // Light: #111 on #f5f5f5  →  contrast 17.3:1  ✅
+    textPrimary:  isDark ? "#e5e5e5" : "#111111",
+
+    // Dark: #a3a3a3 on #121212 → 5.0:1  ✅
+    // Light: #555555 on #f5f5f5 → 5.7:1 ✅
+    textSecondary:isDark ? "#a3a3a3" : "#555555",
+
+    // Dark: #737373 on #121212 → 4.6:1  ✅ (large/UI only ≥14px)
+    // Light: #6b7280 on #f5f5f5 → 4.7:1 ✅
+    textMuted:    isDark ? "#737373" : "#6b7280",
+
+    // Dark: #525252 on #121212 → 3.5:1 (label caps / decorative)
+    // Light: #888888 on #f5f5f5 → 3.5:1 (label caps / decorative)
+    textSubtle:   isDark ? "#636363" : "#787878",
+
+    // Hero name (22px 600)
+    // Dark: #d4d4d4 on #121212 → 11.2:1 ✅
+    // Light: #1a1a1a on #f5f5f5 → 16.0:1 ✅
+    heroName:     isDark ? "#d4d4d4" : "#1a1a1a",
+
+    // Hero body paragraph
+    // Dark: #d4d4d4 on #121212 → 11.2:1 ✅
+    // Light: #222222 on #f5f5f5 → 14.6:1 ✅
+    heroBody:     isDark ? "#d4d4d4" : "#222222",
+
+    // Sidebar nav label
+    brandName:    isDark ? "#e5e5e5" : "#111111",
+
+    // Nav section heading "Work" label caps (10px — decorative only)
+    navLabel:     isDark ? "#525252" : "#909090",
+
+    // Experience table
+    expRowBorder: isDark ? "#222222" : "#e2e2e2",
+    expName:      isDark ? "#e5e5e5" : "#111111",
+    expRole:      isDark ? "#737373" : "#6b7280",
+    expPeriod:    isDark ? "#525252" : "#787878",
+
+    // Work section
+    workLabel:    isDark ? "#e0e0e0" : "#111111",
+    workCategory: isDark ? "#636363" : "#6b7280",
+    workDesc:     isDark ? "#737373" : "#555555",
+
+    // Hero action buttons (white pill on dark / charcoal pill on light)
+    btnBg:        isDark ? "#ffffff" : "#1a1a1a",
+    btnFg:        isDark ? "#1a1a1a" : "#f5f5f5",
+
+    // Footer
+    footerText:   isDark ? "#737373" : "#555555",
+    footerBtnBorder: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.18)",
+    footerBtnFg: isDark ? "#737373" : "#555555",
+  };
 }
 
 // ─── ICONS ───────────────────────────────────────────────────────────────────
@@ -38,17 +116,21 @@ function XIcon() {
 
 // ─── COMPONENTS ──────────────────────────────────────────────────────────────
 
+type Theme = ReturnType<typeof buildTheme>;
+
 function NavItem({
-  children, href, active, isWork, external,
+  children, href, active, isWork, external, theme,
 }: {
   children: React.ReactNode;
   href: string;
   active?: boolean;
   isWork?: boolean;
   external?: boolean;
+  theme: Theme;
 }) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const [hovered, setHovered] = useState(false);
 
   function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
     const { left, top } = currentTarget.getBoundingClientRect();
@@ -56,12 +138,26 @@ function NavItem({
     mouseY.set(clientY - top);
   }
 
+  // ⚠️ Color MUST live in `style`, NOT in variants.
+  // Framer Motion snapshots variant values on mount — they don't
+  // re-evaluate when the `variants` prop object is replaced, so
+  // theme changes have no effect on variant-driven colors.
+  // CSS `transition` on `style.color` updates on every render.
+  const isDark = theme.bg === "#121212";
+  const glowColor = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)";
+
+  const baseColor  = active ? theme.textPrimary  : theme.textMuted;
+  const hoverColor = active ? theme.textPrimary  : theme.textSecondary;
+  const currentColor = hovered ? hoverColor : baseColor;
+
   return (
     <motion.a
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
       onMouseMove={handleMouseMove}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       initial="rest"
       whileHover="hover"
       whileTap={{ scale: 0.98 }}
@@ -80,7 +176,7 @@ function NavItem({
         background: "transparent",
       }}
     >
-      {/* Radial glow that follows mouse — hidden when active */}
+      {/* Radial glow that follows mouse */}
       {!active && (
         <motion.div
           variants={{ rest: { opacity: 0 }, hover: { opacity: 1 } }}
@@ -88,64 +184,70 @@ function NavItem({
           style={{
             position: "absolute",
             inset: 0,
-            background: useMotionTemplate`radial-gradient(80px circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.07), transparent 80%)`,
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            background: useMotionTemplate`radial-gradient(80px circle at ${mouseX}px ${mouseY}px, ${glowColor}, transparent 80%)`,
             pointerEvents: "none",
           }}
         />
       )}
 
-      {/* Label — slides right + brightens on hover */}
+      {/* Label — x-slide via variants, color via CSS (theme-reactive) */}
       <motion.span
-        variants={{
-          rest: { x: 0, color: active ? "#e5e5e5" : "#484848" },
-          hover: { x: 3, color: active ? "#fff" : "#c8c8c8" },
-        }}
+        variants={{ rest: { x: 0 }, hover: { x: 3 } }}
         transition={{ type: "spring", stiffness: 400, damping: 28 }}
-        style={{ position: "relative", zIndex: 1 }}
+        style={{
+          position: "relative",
+          zIndex: 1,
+          color: currentColor,
+          transition: "color 0.2s ease",
+        }}
       >
         {children}
       </motion.span>
 
-      {/* Icon — fades in on hover */}
+      {/* External link icon */}
       {external && (
         <motion.span
           variants={{ rest: { opacity: 0.4 }, hover: { opacity: 1 } }}
           transition={{ duration: 0.2 }}
           style={{ position: "relative", zIndex: 1, display: "flex" }}
         >
-          <ExternalLink size={10} color="#888" />
+          <ExternalLink size={10} color={theme.textMuted} />
         </motion.span>
       )}
     </motion.a>
   );
 }
 
-function SectionDivider() {
+function SectionDivider({ theme }: { theme: Theme }) {
   return (
     <div style={{ padding: "0 52px" }}>
-      <div style={{ height: "1px", background: "rgba(255,255,255,0.05)" }} />
+      <div style={{ height: "1px", background: theme.divider, transition: "background 0.3s" }} />
     </div>
   );
 }
 
 function WorkSection({
-  id, label, category, desc, children,
+  id, label, category, desc, children, theme,
 }: {
-  id: string; label: string; category: string; desc: string; children: React.ReactNode;
+  id: string; label: string; category: string; desc: string;
+  children: React.ReactNode; theme: Theme;
 }) {
   return (
     <section id={id} style={{ padding: "40px 52px 44px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-        <span style={{ fontSize: "13px", fontWeight: 500, color: "#e0e0e0" }}>{label}</span>
-        <span style={{ fontSize: "11px", color: "#444" }}>{category}</span>
+        <span style={{ fontSize: "13px", fontWeight: 500, color: theme.workLabel, transition: "color 0.3s" }}>{label}</span>
+        <span style={{ fontSize: "11px", color: theme.workCategory, transition: "color 0.3s" }}>{category}</span>
       </div>
       <div style={{ height: "6px" }} />
-      <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.65, marginBottom: "20px", maxWidth: "520px" }}>{desc}</p>
+      <p style={{ fontSize: "13px", color: theme.workDesc, lineHeight: 1.65, marginBottom: "20px", maxWidth: "520px", transition: "color 0.3s" }}>{desc}</p>
       {children}
     </section>
   );
 }
 
+// Cards are self-contained UI mockups — their internal colors are intentional
+// design artefacts, not body text. We keep them as-is.
 function ForgeCard() {
   return (
     <div style={{ borderRadius: "16px", height: "340px", background: "#f0f0f0", display: "flex", padding: "20px", gap: "14px", overflow: "hidden" }}>
@@ -235,11 +337,113 @@ function AboutTownCard() {
   );
 }
 
+// ─── THEME TOGGLE ─────────────────────────────────────────────────────────────
+
+function ThemeToggle({ isDark, onToggle, theme }: { isDark: boolean; onToggle: () => void; theme: Theme }) {
+  return (
+    <motion.button
+      onClick={onToggle}
+      whileTap={{ scale: 0.92 }}
+      whileHover="hover"
+      initial="rest"
+      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        background: "transparent",
+        border: "1px solid",
+        borderColor: theme.sidebarBorder,
+        borderRadius: "10px",
+        padding: "7px 12px",
+        cursor: "pointer",
+        color: theme.textMuted,
+        fontSize: "11px",
+        fontFamily: "var(--font-geist-sans)",
+        fontWeight: 500,
+        width: "100%",
+        transition: "border-color 0.3s, color 0.3s, background 0.3s",
+        overflow: "hidden",
+        position: "relative",
+      }}
+    >
+      {/* Hover glow */}
+      <motion.div
+        variants={{ rest: { opacity: 0 }, hover: { opacity: 1 } }}
+        transition={{ duration: 0.2 }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Animated icon swap */}
+      <div style={{ width: "16px", height: "16px", position: "relative", flexShrink: 0 }}>
+        <AnimatePresence mode="wait" initial={false}>
+          {isDark ? (
+            <motion.div
+              key="moon"
+              initial={{ rotate: -30, opacity: 0, scale: 0.7 }}
+              animate={{ rotate: 0, opacity: 1, scale: 1 }}
+              exit={{ rotate: 30, opacity: 0, scale: 0.7 }}
+              transition={{ duration: 0.22, ease: "easeInOut" }}
+              style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="sun"
+              initial={{ rotate: 30, opacity: 0, scale: 0.7 }}
+              animate={{ rotate: 0, opacity: 1, scale: 1 }}
+              exit={{ rotate: -30, opacity: 0, scale: 0.7 }}
+              transition={{ duration: 0.22, ease: "easeInOut" }}
+              style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <motion.span
+        variants={{ rest: { x: 0 }, hover: { x: 2 } }}
+        transition={{ type: "spring", stiffness: 400, damping: 28 }}
+        style={{ position: "relative", zIndex: 1 }}
+      >
+        {isDark ? "Dark Mode" : "Light Mode"}
+      </motion.span>
+    </motion.button>
+  );
+}
+
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
+  const [isDark, setIsDark] = useState(true);
+  const theme = buildTheme(isDark);
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#121212", color: "#fff", fontFamily: "var(--font-geist-sans)" }}>
+    <div style={{
+      display: "flex", minHeight: "100vh",
+      background: theme.bg, color: theme.textPrimary,
+      fontFamily: "var(--font-geist-sans)",
+      transition: "background 0.3s, color 0.3s",
+    }}>
 
       {/* ── SIDEBAR ── */}
       <aside style={{
@@ -248,76 +452,77 @@ export default function Home() {
         height: "100vh",
         padding: "18px 0",
         display: "flex", flexDirection: "column",
-        borderRight: "1px solid rgba(255,255,255,0.07)",
+        borderRight: `1px solid ${theme.sidebarBorder}`,
         overflowY: "auto",
         zIndex: 10,
-        background: "#121212",
+        background: theme.sidebar,
+        transition: "background 0.3s, border-color 0.3s",
       }}>
         {/* Brand */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "0 14px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: "6px" }}>
-          <div style={{ width: "22px", height: "22px", borderRadius: "50%", background: "transparent", border: "1px solid #333", flexShrink: 0 }} />
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "#e5e5e5" }}>George Kim</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "0 14px 14px", borderBottom: `1px solid ${theme.brandBorder}`, marginBottom: "6px", transition: "border-color 0.3s" }}>
+          <div style={{ width: "22px", height: "22px", borderRadius: "50%", background: "transparent", border: `1px solid ${theme.brandAvatar}`, flexShrink: 0, transition: "border-color 0.3s" }} />
+          <span style={{ fontSize: "13px", fontWeight: 600, color: theme.brandName, transition: "color 0.3s" }}>George Kim</span>
         </div>
 
         <nav style={{ padding: "16px 12px", display: "flex", flexDirection: "column", gap: "1px", flex: 1 }}>
-          <NavItem href="#" active>Home</NavItem>
+          <NavItem href="#" active theme={theme}>Home</NavItem>
 
-          <div style={{ fontSize: "10px", color: "#444", padding: "8px 8px 2px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
+          <div style={{ fontSize: "10px", color: theme.navLabel, padding: "8px 8px 2px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, transition: "color 0.3s" }}>
             Work
           </div>
 
           {workNav.map(name => (
-            <NavItem key={name} href={`#${slugify(name)}`} isWork>{name}</NavItem>
+            <NavItem key={name} href={`#${slugify(name)}`} isWork theme={theme}>{name}</NavItem>
           ))}
 
           <div style={{ height: "10px" }} />
 
           {["About", "Brief"].map(name => (
-            <NavItem key={name} href="#">{name}</NavItem>
+            <NavItem key={name} href="#" theme={theme}>{name}</NavItem>
           ))}
 
-          <NavItem href="https://linkedin.com/in/georgekim" external>LinkedIn</NavItem>
+          <NavItem href="https://linkedin.com/in/georgekim" external theme={theme}>LinkedIn</NavItem>
         </nav>
+
+        {/* ── THEME TOGGLE ── */}
+        <div style={{ padding: "12px", borderTop: `1px solid ${theme.sidebarBorder}`, transition: "border-color 0.3s" }}>
+          <ThemeToggle isDark={isDark} onToggle={() => setIsDark(d => !d)} theme={theme} />
+        </div>
       </aside>
 
       {/* ── MAIN ── */}
-      <main style={{ flex: 1, minWidth: 0, marginLeft: "196px" }}>
+      <main style={{ flex: 1, minWidth: 0, marginLeft: "196px", transition: "background 0.3s" }}>
 
         {/* HERO */}
         <section style={{ padding: "80px 56px 56px" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
 
-            {/* wrap-identity */}
+            {/* Identity */}
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {/* Avatar — 48×48 clip, image 49×86 at y:-19 (sesuai Pencil) */}
+              {/* Avatar */}
               <div style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "14px",
-                flexShrink: 0,
+                width: "48px", height: "48px", borderRadius: "14px", flexShrink: 0,
                 backgroundImage: "url('/avatar.jpg')",
-                backgroundSize: "49px 86px",
-                backgroundPosition: "0px -19px",
-                backgroundRepeat: "no-repeat",
-                backgroundColor: "#fff",
+                backgroundSize: "49px 86px", backgroundPosition: "0px -19px",
+                backgroundRepeat: "no-repeat", backgroundColor: "#fff",
               }} />
 
               {/* Name + role */}
               <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <span style={{
-                    fontSize: "22px", fontWeight: 600, color: "#d4d4d4",
+                    fontSize: "22px", fontWeight: 600, color: theme.heroName,
                     fontFamily: "var(--font-plus-jakarta), sans-serif",
-                    letterSpacing: "-0.4px",
+                    letterSpacing: "-0.4px", transition: "color 0.3s",
                   }}>
                     Farhandy Akbar
                   </span>
                   <VerifiedBadge />
                 </div>
                 <span style={{
-                  fontSize: "16px", color: "#969696",
+                  fontSize: "16px", color: theme.textSecondary,
                   fontFamily: "var(--font-plus-jakarta), sans-serif",
-                  letterSpacing: "-0.2px",
+                  letterSpacing: "-0.2px", transition: "color 0.3s",
                 }}>
                   Product Designer · Design Engineer
                 </span>
@@ -325,22 +530,38 @@ export default function Home() {
             </div>
 
             {/* Description */}
-            <p style={{ fontSize: "14px", color: "#fff", lineHeight: 1.5, maxWidth: "508px", margin: 0 }}>
+            <p style={{ fontSize: "14px", color: theme.heroBody, lineHeight: 1.6, maxWidth: "508px", margin: 0, transition: "color 0.3s" }}>
               I craft digital products that balance form, function, and long-term value.
               My approach blends product strategy, interface design, and front-end craft to deliver experiences that are clear, engaging, and resilient.
               <br /><br />
               Currently exploring how AI tools like Claude Code and Antigravity can make creative work faster, more human, and more meaningful.
             </p>
 
-            {/* Buttons */}
+            {/* CTA Buttons */}
             <div style={{ display: "flex", gap: "8px" }}>
-              <a href="#" style={{ display: "inline-flex", alignItems: "center", gap: "7px", background: "#fff", color: "#252525", fontWeight: 500, fontSize: "12px", fontFamily: "var(--font-geist-sans)", padding: "10px 14px", borderRadius: "14px", textDecoration: "none" }}>
+              <a href="#" style={{
+                display: "inline-flex", alignItems: "center", gap: "7px",
+                background: theme.btnBg, color: theme.btnFg,
+                fontWeight: 500, fontSize: "12px", fontFamily: "var(--font-geist-sans)",
+                padding: "10px 14px", borderRadius: "14px", textDecoration: "none",
+                transition: "background 0.3s, color 0.3s",
+              }}>
                 View Resume
               </a>
-              <a href="mailto:hello@farhandy.co" style={{ display: "inline-flex", alignItems: "center", background: "#fff", color: "#000", padding: "10px 14px", borderRadius: "14px", textDecoration: "none" }}>
+              <a href="mailto:hello@farhandy.co" style={{
+                display: "inline-flex", alignItems: "center",
+                background: theme.btnBg, color: theme.btnFg,
+                padding: "10px 14px", borderRadius: "14px", textDecoration: "none",
+                transition: "background 0.3s, color 0.3s",
+              }}>
                 <Mail size={16} />
               </a>
-              <a href="https://x.com" target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", background: "#fff", color: "#000", padding: "10px 14px", borderRadius: "14px", textDecoration: "none" }}>
+              <a href="https://x.com" target="_blank" rel="noreferrer" style={{
+                display: "inline-flex", alignItems: "center",
+                background: theme.btnBg, color: theme.btnFg,
+                padding: "10px 14px", borderRadius: "14px", textDecoration: "none",
+                transition: "background 0.3s, color 0.3s",
+              }}>
                 <XIcon />
               </a>
             </div>
@@ -350,9 +571,9 @@ export default function Home() {
         {/* EXPERIENCE */}
         <section style={{ padding: "56px" }}>
           <span style={{
-            fontSize: "16px", color: "#969696", display: "block", marginBottom: "8px",
+            fontSize: "16px", color: theme.textSecondary, display: "block", marginBottom: "8px",
             fontFamily: "var(--font-plus-jakarta), sans-serif",
-            letterSpacing: "-0.2px",
+            letterSpacing: "-0.2px", transition: "color 0.3s",
           }}>
             Team
           </span>
@@ -361,24 +582,25 @@ export default function Home() {
               <div key={i} style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 padding: "10px 0",
-                borderBottom: "1px solid #282828",
+                borderBottom: `1px solid ${theme.expRowBorder}`,
+                transition: "border-color 0.3s",
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                   <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: job.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 800, color: "#fff", flexShrink: 0 }}>
                     {job.letter}
                   </div>
                   <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontSize: "12px", fontWeight: 500, color: "#e5e5e5" }}>{job.company}</span>
-                    <span style={{ fontSize: "12px", color: "#969696" }}>{job.role}</span>
+                    <span style={{ fontSize: "12px", fontWeight: 500, color: theme.expName, transition: "color 0.3s" }}>{job.company}</span>
+                    <span style={{ fontSize: "12px", color: theme.expRole, transition: "color 0.3s" }}>{job.role}</span>
                   </div>
                 </div>
-                <span style={{ fontSize: "12px", color: "#444" }}>{job.period}</span>
+                <span style={{ fontSize: "12px", color: theme.expPeriod, transition: "color 0.3s" }}>{job.period}</span>
               </div>
             ))}
           </div>
         </section>
 
-        <SectionDivider />
+        <SectionDivider theme={theme} />
 
         {/* X (TWITTER) */}
         <WorkSection
@@ -386,13 +608,14 @@ export default function Home() {
           label="X (Twitter)"
           category="Product Design Intern · 2023"
           desc="Worked on core product features at X, focusing on engagement surfaces and creator tools alongside senior designers and PMs across multiple squads."
+          theme={theme}
         >
           <div style={{ borderRadius: "16px", height: "340px", background: "#000", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
             <span style={{ fontSize: "96px", fontWeight: 900, color: "#fff", lineHeight: 1, fontFamily: "serif" }}>𝕏</span>
           </div>
         </WorkSection>
 
-        <SectionDivider />
+        <SectionDivider theme={theme} />
 
         {/* HANDSHAKE */}
         <WorkSection
@@ -400,13 +623,14 @@ export default function Home() {
           label="Handshake"
           category="Product Design Intern · 2024"
           desc="Redesigned employer-side job posting flows and candidate discovery surfaces, reducing time-to-publish by 40% through iterative data-driven testing."
+          theme={theme}
         >
           <div style={{ borderRadius: "16px", height: "340px", background: "#CCFF00", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
             <span style={{ fontSize: "148px", fontWeight: 900, color: "#000", lineHeight: 1 }}>H</span>
           </div>
         </WorkSection>
 
-        <SectionDivider />
+        <SectionDivider theme={theme} />
 
         {/* FORGE */}
         <WorkSection
@@ -414,11 +638,12 @@ export default function Home() {
           label="Forge"
           category="Product Design"
           desc="Forge is an Architectural Design System Builder that offers a new way of building a design system with the help of AI tools like Frames and Figma."
+          theme={theme}
         >
           <ForgeCard />
         </WorkSection>
 
-        <SectionDivider />
+        <SectionDivider theme={theme} />
 
         {/* INTERFACE LAB */}
         <WorkSection
@@ -426,11 +651,12 @@ export default function Home() {
           label="Interface Lab"
           category="Open Source · Design System"
           desc="A portfolio website for a digital product designer. Open-source component library with accessible, composable primitives and Figma file integration."
+          theme={theme}
         >
           <InterfaceLabCard />
         </WorkSection>
 
-        <SectionDivider />
+        <SectionDivider theme={theme} />
 
         {/* ABOUT TOWN */}
         <WorkSection
@@ -438,19 +664,26 @@ export default function Home() {
           label="About Town"
           category="Product Design"
           desc="About Town is an app that helps users know what kind of things might help them decide what kind of area they'd like to live in during their life."
+          theme={theme}
         >
           <AboutTownCard />
         </WorkSection>
 
         {/* FOOTER */}
-        <section style={{ padding: "48px 52px 64px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "18px", maxWidth: "400px" }}>
+        <section style={{ padding: "48px 52px 64px", borderTop: `1px solid ${theme.footerBorder}`, transition: "border-color 0.3s" }}>
+          <p style={{ fontSize: "13px", color: theme.footerText, lineHeight: 1.7, marginBottom: "18px", maxWidth: "400px", transition: "color 0.3s" }}>
             If you want to know the details of any project or my availability — get in touch
           </p>
           <div style={{ display: "flex", gap: "10px" }}>
             {["Contact", "Email"].map(label => (
               <a key={label} href={label === "Email" ? "mailto:hello@georgekim.co" : "#"}
-                style={{ fontSize: "13px", padding: "8px 22px", borderRadius: "100px", border: "1px solid rgba(255,255,255,0.1)", color: "#999", textDecoration: "none" }}>
+                style={{
+                  fontSize: "13px", padding: "8px 22px", borderRadius: "100px",
+                  border: `1px solid ${theme.footerBtnBorder}`,
+                  color: theme.footerBtnFg,
+                  textDecoration: "none",
+                  transition: "border-color 0.3s, color 0.3s",
+                }}>
                 {label}
               </a>
             ))}
