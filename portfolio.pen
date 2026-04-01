@@ -22,35 +22,6 @@
           "children": [
             {
               "type": "frame",
-              "id": "Xszls",
-              "name": "brand",
-              "width": "fill_container",
-              "gap": 8,
-              "padding": 20,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "dFhaD",
-                  "name": "brandText",
-                  "fill": "#e5e5e5",
-                  "content": "Farhandy Akbar",
-                  "fontFamily": "Inter",
-                  "fontSize": 13,
-                  "fontWeight": "600"
-                }
-              ]
-            },
-            {
-              "type": "rectangle",
-              "id": "DnQtH",
-              "name": "brandDivider",
-              "fill": "#ffffff0f",
-              "width": "fill_container",
-              "height": 1
-            },
-            {
-              "type": "frame",
               "id": "RvPQy",
               "name": "sidebarNav",
               "clip": true,
@@ -609,13 +580,48 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "frame",
+                  "id": "UC0GO",
+                  "name": "wrap-copy email",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "fZVCs",
+                      "fill": "#ffffffff",
+                      "content": "Press",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "12lbK",
+                      "fill": "#ffffffff",
+                      "content": "C",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "xr8Tw",
+                      "fill": "#ffffffff",
+                      "content": "to copy my Email",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
                 }
               ]
             },
             {
               "type": "frame",
               "id": "EFtDV",
-              "name": "expSection",
+              "name": "section-exp",
               "width": "fill_container",
               "layout": "vertical",
               "gap": 8,
@@ -1234,247 +1240,483 @@
             },
             {
               "type": "frame",
-              "id": "xDum2",
-              "name": "div2Wrapper",
-              "width": "fill_container",
-              "padding": [
-                0,
-                52
-              ],
-              "children": [
-                {
-                  "type": "rectangle",
-                  "id": "v0AAT",
-                  "name": "div2Line",
-                  "fill": "#ffffff0f",
-                  "width": "fill_container",
-                  "height": 1
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "apn5e",
-              "name": "xSection",
+              "id": "kX0xu",
+              "name": "section-work",
               "width": "fill_container",
               "layout": "vertical",
+              "gap": 16,
               "padding": [
-                40,
-                100,
-                44,
+                56,
                 100
               ],
               "children": [
                 {
+                  "type": "text",
+                  "id": "ZhYcg",
+                  "name": "works",
+                  "fill": "#969696ff",
+                  "content": "Works",
+                  "fontFamily": "Plus Jakarta Sans",
+                  "fontSize": 16,
+                  "fontWeight": "normal",
+                  "letterSpacing": -0.2
+                },
+                {
                   "type": "frame",
-                  "id": "eGnD9",
-                  "name": "xHeader",
+                  "id": "H0MpW",
+                  "name": "Frame 2",
                   "width": "fill_container",
-                  "justifyContent": "space_between",
-                  "alignItems": "center",
+                  "layout": "vertical",
+                  "gap": 40,
                   "children": [
                     {
-                      "type": "text",
-                      "id": "vJ0RJ",
-                      "name": "xLabel",
-                      "fill": "#e0e0e0",
-                      "content": "X (Twitter)",
-                      "fontFamily": "Inter",
-                      "fontSize": 13,
-                      "fontWeight": "500"
+                      "type": "frame",
+                      "id": "3X2IF",
+                      "name": "works2",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "N1id2",
+                          "name": "xCard",
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 340,
+                          "fill": "#000000",
+                          "cornerRadius": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "aRgLx",
+                              "name": "xCardLogo",
+                              "fill": "#ffffff",
+                              "content": "𝕏",
+                              "fontFamily": "Inter",
+                              "fontSize": 96,
+                              "fontWeight": "900"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "EwIzW",
+                          "name": "Frame 1",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Ljmw1",
+                              "name": "xHeader",
+                              "width": "fill_container",
+                              "height": "fit_content(17)",
+                              "layout": "none",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "ZWdJL",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "xLabel",
+                                  "fill": "#e0e0e0",
+                                  "content": "X (Twitter)",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "R92c7",
+                              "name": "expRow1Period",
+                              "fill": "#969696",
+                              "content": "Apr 2022 - Sep 2023",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "9Erii",
+                              "name": "xDesc",
+                              "fill": "#555555",
+                              "textGrowth": "fixed-width",
+                              "width": 520,
+                              "content": "Worked on core product features at X, focusing on engagement surfaces and creator tools alongside senior designers and PMs across multiple squads.",
+                              "lineHeight": 1.65,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "type": "text",
-                      "id": "8aEQv",
-                      "name": "xCategory",
-                      "fill": "#444444",
-                      "content": "Product Design Intern · 2023",
-                      "fontFamily": "Inter",
-                      "fontSize": 11,
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "rectangle",
-                  "id": "fcZuB",
-                  "name": "xSpacerDesc",
-                  "width": "fill_container",
-                  "height": 6
-                },
-                {
-                  "type": "text",
-                  "id": "MLgDC",
-                  "name": "xDesc",
-                  "fill": "#555555",
-                  "textGrowth": "fixed-width",
-                  "width": 520,
-                  "content": "Worked on core product features at X, focusing on engagement surfaces and creator tools alongside senior designers and PMs across multiple squads.",
-                  "lineHeight": 1.65,
-                  "fontFamily": "Inter",
-                  "fontSize": 13,
-                  "fontWeight": "normal"
-                },
-                {
-                  "type": "rectangle",
-                  "id": "TZeRl",
-                  "name": "xSpacerCard",
-                  "width": "fill_container",
-                  "height": 20
-                },
-                {
-                  "type": "frame",
-                  "id": "9gEoX",
-                  "name": "xCard",
-                  "clip": true,
-                  "width": "fill_container",
-                  "height": 340,
-                  "fill": "#000000",
-                  "cornerRadius": 8,
-                  "justifyContent": "center",
-                  "alignItems": "center",
-                  "children": [
+                      "type": "frame",
+                      "id": "pkWWt",
+                      "name": "works1",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "3Kfk8",
+                          "name": "xCard",
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 340,
+                          "fill": "#000000",
+                          "cornerRadius": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "DWrI1",
+                              "name": "xCardLogo",
+                              "fill": "#ffffff",
+                              "content": "𝕏",
+                              "fontFamily": "Inter",
+                              "fontSize": 96,
+                              "fontWeight": "900"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "siDbs",
+                          "name": "Frame 1",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "lqoER",
+                              "name": "xHeader",
+                              "width": "fill_container",
+                              "height": "fit_content(17)",
+                              "layout": "none",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "GXw8J",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "xLabel",
+                                  "fill": "#e0e0e0",
+                                  "content": "X (Twitter)",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "qAhjS",
+                              "name": "expRow1Period",
+                              "fill": "#969696",
+                              "content": "Apr 2022 - Sep 2023",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "mdWeT",
+                              "name": "xDesc",
+                              "fill": "#555555",
+                              "textGrowth": "fixed-width",
+                              "width": 520,
+                              "content": "Worked on core product features at X, focusing on engagement surfaces and creator tools alongside senior designers and PMs across multiple squads.",
+                              "lineHeight": 1.65,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
                     {
-                      "type": "text",
-                      "id": "fp5Y1",
-                      "name": "xCardLogo",
-                      "fill": "#ffffff",
-                      "content": "𝕏",
-                      "fontFamily": "Inter",
-                      "fontSize": 96,
-                      "fontWeight": "900"
+                      "type": "frame",
+                      "id": "3kYh3",
+                      "name": "works1",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "qbn4I",
+                          "name": "xCard",
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 340,
+                          "fill": "#000000",
+                          "cornerRadius": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "KkljF",
+                              "name": "xCardLogo",
+                              "fill": "#ffffff",
+                              "content": "𝕏",
+                              "fontFamily": "Inter",
+                              "fontSize": 96,
+                              "fontWeight": "900"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "C1MWl",
+                          "name": "Frame 1",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "iBXkU",
+                              "name": "xHeader",
+                              "width": "fill_container",
+                              "height": "fit_content(17)",
+                              "layout": "none",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "V3OY8",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "xLabel",
+                                  "fill": "#e0e0e0",
+                                  "content": "X (Twitter)",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "Veb6G",
+                              "name": "expRow1Period",
+                              "fill": "#969696",
+                              "content": "Apr 2022 - Sep 2023",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "x89QK",
+                              "name": "xDesc",
+                              "fill": "#555555",
+                              "textGrowth": "fixed-width",
+                              "width": 520,
+                              "content": "Worked on core product features at X, focusing on engagement surfaces and creator tools alongside senior designers and PMs across multiple squads.",
+                              "lineHeight": 1.65,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xkKsO",
+                      "name": "works1",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "oEJk0",
+                          "name": "xCard",
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 340,
+                          "fill": "#000000",
+                          "cornerRadius": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "FyVG3",
+                              "name": "xCardLogo",
+                              "fill": "#ffffff",
+                              "content": "𝕏",
+                              "fontFamily": "Inter",
+                              "fontSize": 96,
+                              "fontWeight": "900"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "5fbqo",
+                          "name": "Frame 1",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "jVDjf",
+                              "name": "xHeader",
+                              "width": "fill_container",
+                              "height": "fit_content(17)",
+                              "layout": "none",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "pfT8Y",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "xLabel",
+                                  "fill": "#e0e0e0",
+                                  "content": "X (Twitter)",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "TRqFm",
+                              "name": "expRow1Period",
+                              "fill": "#969696",
+                              "content": "Apr 2022 - Sep 2023",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "R5lAw",
+                              "name": "xDesc",
+                              "fill": "#555555",
+                              "textGrowth": "fixed-width",
+                              "width": 520,
+                              "content": "Worked on core product features at X, focusing on engagement surfaces and creator tools alongside senior designers and PMs across multiple squads.",
+                              "lineHeight": 1.65,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "sNtDe",
+                      "name": "works1",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "MCagX",
+                          "name": "xCard",
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 340,
+                          "fill": "#000000",
+                          "cornerRadius": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "qo1Gh",
+                              "name": "xCardLogo",
+                              "fill": "#ffffff",
+                              "content": "𝕏",
+                              "fontFamily": "Inter",
+                              "fontSize": 96,
+                              "fontWeight": "900"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "s2y8Y",
+                          "name": "Frame 1",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Ezoio",
+                              "name": "xHeader",
+                              "width": "fill_container",
+                              "height": "fit_content(17)",
+                              "layout": "none",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "26wSU",
+                                  "x": 0,
+                                  "y": 0,
+                                  "name": "xLabel",
+                                  "fill": "#e0e0e0",
+                                  "content": "X (Twitter)",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "MKjyc",
+                              "name": "expRow1Period",
+                              "fill": "#969696",
+                              "content": "Apr 2022 - Sep 2023",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "yfxl7",
+                              "name": "xDesc",
+                              "fill": "#555555",
+                              "textGrowth": "fixed-width",
+                              "width": 520,
+                              "content": "Worked on core product features at X, focusing on engagement surfaces and creator tools alongside senior designers and PMs across multiple squads.",
+                              "lineHeight": 1.65,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }
               ]
-            },
-            {
-              "type": "rectangle",
-              "id": "NFdV8",
-              "name": "xDivider",
-              "fill": "#ffffff0d",
-              "width": "fill_container",
-              "height": 1
-            },
-            {
-              "type": "frame",
-              "id": "fV8Lk",
-              "name": "hsSection",
-              "width": "fill_container",
-              "layout": "vertical",
-              "padding": [
-                40,
-                100,
-                44,
-                100
-              ],
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "JbaQh",
-                  "name": "hsHeader",
-                  "width": "fill_container",
-                  "justifyContent": "space_between",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "RW5wg",
-                      "name": "hsLabel",
-                      "fill": "#e0e0e0",
-                      "content": "Handshake",
-                      "fontFamily": "Inter",
-                      "fontSize": 13,
-                      "fontWeight": "500"
-                    },
-                    {
-                      "type": "text",
-                      "id": "2ObnM",
-                      "name": "hsCategory",
-                      "fill": "#444444",
-                      "content": "Product Design Intern · 2024",
-                      "fontFamily": "Inter",
-                      "fontSize": 11,
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "rectangle",
-                  "id": "7hrSN",
-                  "name": "hsSpacerDesc",
-                  "width": "fill_container",
-                  "height": 6
-                },
-                {
-                  "type": "text",
-                  "id": "ENM8A",
-                  "name": "hsDesc",
-                  "fill": "#555555",
-                  "textGrowth": "fixed-width",
-                  "width": 520,
-                  "content": "Redesigned employer-side job posting flows and candidate discovery surfaces, reducing time-to-publish by 40% through iterative data-driven testing.",
-                  "lineHeight": 1.65,
-                  "fontFamily": "Inter",
-                  "fontSize": 13,
-                  "fontWeight": "normal"
-                },
-                {
-                  "type": "rectangle",
-                  "id": "Ivhd0",
-                  "name": "hsSpacerCard",
-                  "width": "fill_container",
-                  "height": 20
-                },
-                {
-                  "type": "frame",
-                  "id": "R4SZi",
-                  "name": "hsCard",
-                  "clip": true,
-                  "width": "fill_container",
-                  "height": 340,
-                  "fill": "#CCFF00",
-                  "cornerRadius": 8,
-                  "justifyContent": "center",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "EGTb6",
-                      "name": "hsCardLetter",
-                      "fill": "#000000",
-                      "content": "H",
-                      "fontFamily": "Inter",
-                      "fontSize": 148,
-                      "fontWeight": "900"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "rectangle",
-              "id": "zhQnF",
-              "name": "hsDivider",
-              "fill": "#ffffff0d",
-              "width": "fill_container",
-              "height": 1
-            },
-            {
-              "type": "rectangle",
-              "id": "qizVH",
-              "name": "forgeDivider",
-              "fill": "#ffffff0d",
-              "width": "fill_container",
-              "height": 1
-            },
-            {
-              "type": "rectangle",
-              "id": "b0So2",
-              "name": "ilDivider",
-              "fill": "#ffffff0d",
-              "width": "fill_container",
-              "height": 1
             },
             {
               "type": "rectangle",
@@ -1492,9 +1734,9 @@
               "layout": "vertical",
               "padding": [
                 48,
-                52,
+                100,
                 64,
-                52
+                100
               ],
               "children": [
                 {

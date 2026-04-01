@@ -1,8 +1,8 @@
 "use client";
 
 import { ExternalLink, Mail } from "lucide-react";
-import { motion, useMotionTemplate, useMotionValue, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -15,7 +15,14 @@ const experience = [
   { company: "Sans Brothers", role: "UI/UX Designer", period: "Apr 2022 - Sep 2023", img: "/sb.png" },
 ];
 
-const workNav = ["X (Twitter)", "Handshake"];
+const workNav = ["X (Twitter)", "Handshake", "Forge", "Interface Lab", "About Town"];
+
+const works = Array.from({ length: 5 }).map((_, i) => ({
+  key: `x-${i}`,
+  label: "X (Twitter)",
+  period: "Apr 2022 - Sep 2023",
+  desc: "Worked on core product features at X, focusing on engagement surfaces and creator tools alongside senior designers and PMs across multiple squads.",
+}));
 
 function slugify(s: string) {
   return s.toLowerCase().replace(/[\s()]+/g, "");
@@ -23,35 +30,30 @@ function slugify(s: string) {
 
 // ─── THEME TOKENS ─────────────────────────────────────────────────────────────
 
-function buildTheme(isDark: boolean) {
-  return {
-    bg:           isDark ? "#121212" : "#f5f5f5",
-    sidebar:      isDark ? "#121212" : "#f0f0f0",
-    sidebarBorder:isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)",
-    divider:      isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.08)",
-    brandBorder:  isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.09)",
-    footerBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.09)",
-    textPrimary:  isDark ? "#e5e5e5" : "#111111",
-    textSecondary:isDark ? "#969696" : "#555555",
-    textMuted:    isDark ? "#484848" : "#6b7280",
-    navLabel:     isDark ? "#383838" : "#909090",
-    heroName:     isDark ? "#d4d4d4" : "#1a1a1a",
-    heroBody:     isDark ? "#ffffff" : "#222222",
-    brandName:    isDark ? "#e5e5e5" : "#111111",
-    expRowBorder: isDark ? "#282828" : "#e2e2e2",
-    expName:      isDark ? "#e5e5e5" : "#111111",
-    expRole:      isDark ? "#969696" : "#6b7280",
-    expPeriod:    isDark ? "#969696" : "#787878",
-    workLabel:    isDark ? "#e0e0e0" : "#111111",
-    workCategory: isDark ? "#444444" : "#6b7280",
-    workDesc:     isDark ? "#555555" : "#555555",
-    btnBg:        isDark ? "#ffffff" : "#1a1a1a",
-    btnFg:        isDark ? "#1a1a1a" : "#f5f5f5",
-    footerText:   isDark ? "#555555" : "#555555",
-    footerBtnBorder: isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.18)",
-    footerBtnFg: isDark ? "#999999" : "#555555",
-  };
-}
+const theme = {
+  bg: "#121212",
+  sidebar: "#121212",
+  sidebarBorder: "#ffffff12",
+  sidebarDivider: "#ffffff0f",
+  textPrimary: "#e5e5e5",
+  textSecondary: "#969696",
+  textMuted: "#484848",
+  navLabel: "#383838",
+  heroName: "#d4d4d4",
+  heroRole: "#969696ff",
+  heroBody: "#ffffffff",
+  expRowBorder: "#282828ff",
+  expRole: "#969696",
+  expPeriod: "#969696",
+  workMeta: "#969696",
+  workDesc: "#555555",
+  footerDivider: "#ffffff0f",
+  footerText: "#555555",
+  footerBtnBorder: "#ffffff1a",
+  footerBtnFg: "#999999",
+  btnBg: "#ffffffff",
+  btnText: "#252525",
+} as const;
 
 // ─── ICONS ───────────────────────────────────────────────────────────────────
 
@@ -73,8 +75,6 @@ function XIcon() {
 
 // ─── COMPONENTS ──────────────────────────────────────────────────────────────
 
-type Theme = ReturnType<typeof buildTheme>;
-
 function NavItem({
   children, href, active, isWork, external, theme,
 }: {
@@ -85,35 +85,20 @@ function NavItem({
   external?: boolean;
   theme: Theme;
 }) {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const [hovered, setHovered] = useState(false);
-
-  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
-
-  const isDark = theme.bg === "#121212";
-  const glowColor = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)";
-  const baseColor  = active ? theme.textPrimary : theme.textMuted;
-  const hoverColor = active ? theme.textPrimary : theme.textSecondary;
-  const currentColor = hovered ? hoverColor : baseColor;
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.a
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      initial="rest"
-      whileHover="hover"
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      whileHover={{ y: -1, scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
       style={{
         position: "relative",
+        fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
         fontSize: isWork ? "12px" : "13px",
         padding: isWork ? "5px 8px 5px 14px" : "6px 8px",
         borderRadius: "5px",
@@ -121,37 +106,64 @@ function NavItem({
         fontWeight: active ? 500 : 400,
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: external ? "space-between" : "flex-start",
         gap: "4px",
-        overflow: "hidden",
         background: "transparent",
+        color: active ? theme.textPrimary : theme.textMuted,
+        overflow: "hidden",
       }}
     >
       {!active && (
-        <motion.div
-          variants={{ rest: { opacity: 0 }, hover: { opacity: 1 } }}
-          transition={{ duration: 0.25 }}
-          style={{
-            position: "absolute",
-            inset: 0,
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            background: useMotionTemplate`radial-gradient(80px circle at ${mouseX}px ${mouseY}px, ${glowColor}, transparent 80%)`,
-            pointerEvents: "none",
-          }}
-        />
+        <>
+          <motion.div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "linear-gradient(90deg, rgba(255,255,255,0.07), rgba(255,255,255,0))",
+              pointerEvents: "none",
+            }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+          />
+          <motion.div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: "22%",
+              bottom: "22%",
+              width: 2,
+              borderRadius: 999,
+              background: "rgba(229,229,229,0.85)",
+              pointerEvents: "none",
+            }}
+            animate={{
+              opacity: isHovered ? 1 : 0,
+              x: isHovered ? 0 : -3,
+            }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          />
+        </>
       )}
+
       <motion.span
-        variants={{ rest: { x: 0 }, hover: { x: 3 } }}
-        transition={{ type: "spring", stiffness: 400, damping: 28 }}
-        style={{ position: "relative", zIndex: 1, color: currentColor, transition: "color 0.2s ease" }}
+        style={{ position: "relative", zIndex: 1 }}
+        animate={{
+          x: isHovered ? 2 : 0,
+          color: isHovered && !active ? theme.textSecondary : active ? theme.textPrimary : theme.textMuted,
+        }}
+        transition={{ type: "spring", stiffness: 360, damping: 24 }}
       >
         {children}
       </motion.span>
       {external && (
         <motion.span
-          variants={{ rest: { opacity: 0.4 }, hover: { opacity: 1 } }}
-          transition={{ duration: 0.2 }}
-          style={{ position: "relative", zIndex: 1, display: "flex" }}
+          style={{ display: "flex", position: "relative", zIndex: 1 }}
+          animate={{
+            opacity: isHovered ? 1 : 0.55,
+            x: isHovered ? 1 : 0,
+            rotate: isHovered ? -6 : 0,
+          }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
         >
           <ExternalLink size={10} color={theme.textMuted} />
         </motion.span>
@@ -160,32 +172,7 @@ function NavItem({
   );
 }
 
-function SectionDivider({ theme }: { theme: Theme }) {
-  return (
-    <div style={{ padding: "0 52px" }}>
-      <div style={{ height: "1px", background: theme.divider, transition: "background 0.3s" }} />
-    </div>
-  );
-}
-
-function WorkSection({
-  id, label, category, desc, children, theme,
-}: {
-  id: string; label: string; category: string; desc: string;
-  children: React.ReactNode; theme: Theme;
-}) {
-  return (
-    <section id={id} style={{ padding: "40px 100px 44px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-        <span style={{ fontSize: "13px", fontWeight: 500, color: theme.workLabel, transition: "color 0.3s" }}>{label}</span>
-        <span style={{ fontSize: "11px", color: theme.workCategory, transition: "color 0.3s" }}>{category}</span>
-      </div>
-      <div style={{ height: "6px" }} />
-      <p style={{ fontSize: "13px", color: theme.workDesc, lineHeight: 1.65, marginBottom: "20px", maxWidth: "520px", transition: "color 0.3s" }}>{desc}</p>
-      {children}
-    </section>
-  );
-}
+type Theme = typeof theme;
 
 // Cards
 function ForgeCard() {
@@ -269,77 +256,69 @@ function AboutTownCard() {
   );
 }
 
-// ─── THEME TOGGLE ─────────────────────────────────────────────────────────────
-
-function ThemeToggle({ isDark, onToggle, theme }: { isDark: boolean; onToggle: () => void; theme: Theme }) {
-  return (
-    <motion.button
-      onClick={onToggle}
-      whileTap={{ scale: 0.92 }}
-      whileHover="hover"
-      initial="rest"
-      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-      style={{
-        display: "flex", alignItems: "center", gap: "8px",
-        background: "transparent", border: "1px solid", borderColor: theme.sidebarBorder,
-        borderRadius: "10px", padding: "7px 12px", cursor: "pointer",
-        color: theme.textMuted, fontSize: "11px", fontFamily: "var(--font-geist-sans)",
-        fontWeight: 500, width: "100%", transition: "border-color 0.3s, color 0.3s, background 0.3s",
-        overflow: "hidden", position: "relative",
-      }}
-    >
-      <motion.div
-        variants={{ rest: { opacity: 0 }, hover: { opacity: 1 } }}
-        transition={{ duration: 0.2 }}
-        style={{ position: "absolute", inset: 0, background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", pointerEvents: "none" }}
-      />
-      <div style={{ width: "16px", height: "16px", position: "relative", flexShrink: 0 }}>
-        <AnimatePresence mode="wait" initial={false}>
-          {isDark ? (
-            <motion.div key="moon" initial={{ rotate: -30, opacity: 0, scale: 0.7 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: 30, opacity: 0, scale: 0.7 }} transition={{ duration: 0.22, ease: "easeInOut" }} style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            </motion.div>
-          ) : (
-            <motion.div key="sun" initial={{ rotate: 30, opacity: 0, scale: 0.7 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: -30, opacity: 0, scale: 0.7 }} transition={{ duration: 0.22, ease: "easeInOut" }} style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-              </svg>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-      <motion.span variants={{ rest: { x: 0 }, hover: { x: 2 } }} transition={{ type: "spring", stiffness: 400, damping: 28 }} style={{ position: "relative", zIndex: 1 }}>
-        {isDark ? "Dark Mode" : "Light Mode"}
-      </motion.span>
-    </motion.button>
-  );
-}
-
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const [isDark, setIsDark] = useState(true);
-  const theme = buildTheme(isDark);
+  const [copyToastVisible, setCopyToastVisible] = useState(false);
+
+  useEffect(() => {
+    const email = "hellofarhandy@gmail.com";
+
+    const copyEmail = async () => {
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(email);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = email;
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.appendChild(textarea);
+          textarea.focus();
+          textarea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textarea);
+        }
+        setCopyToastVisible(true);
+        window.setTimeout(() => setCopyToastVisible(false), 1400);
+      } catch {
+        // Intentionally silent: keep UX non-blocking if copy is unavailable.
+      }
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat || event.key.toLowerCase() !== "c") {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const isEditable =
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        target?.isContentEditable;
+
+      if (isEditable) {
+        return;
+      }
+
+      void copyEmail();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: theme.bg, color: theme.textPrimary, fontFamily: "var(--font-geist-sans)", transition: "background 0.3s, color 0.3s" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: theme.bg, color: theme.textPrimary, fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" }}>
 
       {/* ── SIDEBAR ── */}
-      <aside style={{ width: "196px", minWidth: "196px", position: "fixed", top: 0, left: 0, height: "100vh", padding: "18px 0", display: "flex", flexDirection: "column", borderRight: `1px solid ${theme.sidebarBorder}`, overflowY: "auto", zIndex: 10, background: theme.sidebar, transition: "background 0.3s, border-color 0.3s" }}>
-        {/* Brand */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "0 20px 20px", borderBottom: `1px solid ${theme.brandBorder}`, transition: "border-color 0.3s" }}>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: theme.brandName, transition: "color 0.3s" }}>Farhandy Akbar</span>
-        </div>
-
+      <aside style={{ width: "196px", minWidth: "196px", position: "fixed", top: 0, left: 0, height: "100vh", display: "flex", flexDirection: "column", borderRight: `1px solid ${theme.sidebarBorder}`, overflowY: "auto", zIndex: 10, background: theme.sidebar }}>
         <nav style={{ padding: "16px 12px", display: "flex", flexDirection: "column", gap: "1px", flex: 1 }}>
           <NavItem href="#" active theme={theme}>Home</NavItem>
 
-          <div style={{ fontSize: "10px", color: theme.navLabel, padding: "8px 8px 2px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, transition: "color 0.3s" }}>
+          <div style={{ fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif", fontSize: "10px", color: theme.navLabel, padding: "8px 8px 2px", textTransform: "uppercase", letterSpacing: "0.1px", fontWeight: 600 }}>
             Work
           </div>
 
@@ -355,186 +334,303 @@ export default function Home() {
 
           <NavItem href="https://linkedin.com/in/farhandyakbar" external theme={theme}>LinkedIn</NavItem>
         </nav>
-
-        {/* Theme Toggle */}
-        <div style={{ padding: "12px", borderTop: `1px solid ${theme.sidebarBorder}`, transition: "border-color 0.3s" }}>
-          <ThemeToggle isDark={isDark} onToggle={() => setIsDark(d => !d)} theme={theme} />
-        </div>
       </aside>
 
       {/* ── MAIN ── */}
-      <main style={{ flex: 1, minWidth: 0, marginLeft: "196px", transition: "background 0.3s" }}>
+      <main style={{ flex: 1, minWidth: 0, marginLeft: "197px" }}>
 
         {/* HERO */}
-        <section style={{ padding: "80px 100px 56px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-            {/* wrap-identity */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {/* avatar */}
-              <div style={{ width: "48px", height: "48px", borderRadius: "14px", flexShrink: 0, position: "relative", overflow: "hidden", backgroundColor: "#fff" }}>
-                <div style={{ position: "absolute", width: "49px", height: "86px", top: "-19px", left: "0px", backgroundImage: "url('/WhatsApp Image 2025-09-02 at 21.15.19.jpeg')", backgroundSize: "cover" }} />
-                <div style={{ position: "absolute", width: "61px", height: "108px", top: "-30px", left: "-6.52px", backgroundImage: "url('/pp.jpeg')", backgroundSize: "cover" }} />
-              </div>
-              {/* wrap-headline */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                {/* wrap-name */}
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "24px", fontWeight: 600, color: theme.heroName, fontFamily: "var(--font-plus-jakarta), sans-serif", letterSpacing: "-0.4px", transition: "color 0.3s" }}>
-                    Farhandy Akbar
-                  </span>
-                  <VerifiedBadge />
-                </div>
-                <span style={{ fontSize: "16px", color: theme.textSecondary, fontFamily: "var(--font-plus-jakarta), sans-serif", letterSpacing: "-0.2px", transition: "color 0.3s" }}>
-                  Product Designer · Design Engineer
+        <section style={{ padding: "80px 100px 56px", display: "flex", flexDirection: "column", gap: "24px" }}>
+          {/* wrap-identity */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {/* avatar (48x48, radius 14, clip) */}
+            <div style={{ width: "48px", height: "48px", borderRadius: "14px", flexShrink: 0, position: "relative", overflow: "hidden", backgroundColor: "#ffffff" }}>
+              <img
+                src="/WhatsApp Image 2025-09-02 at 21.15.19.jpeg"
+                alt=""
+                style={{ position: "absolute", width: "49px", height: "86px", left: 0, top: "-19px", objectFit: "cover" }}
+              />
+              <img
+                src="/pp.jpeg"
+                alt=""
+                style={{ position: "absolute", width: "61px", height: "108px", left: "-6.517px", top: "-30px", objectFit: "cover" }}
+              />
+            </div>
+
+            {/* wrap-headline */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ fontFamily: "var(--font-plus-jakarta), sans-serif", fontSize: "24px", fontWeight: 600, letterSpacing: "-0.4px", color: theme.heroName }}>
+                  Farhandy Akbar
                 </span>
+                <VerifiedBadge />
               </div>
+              <span style={{ fontFamily: "var(--font-plus-jakarta), sans-serif", fontSize: "16px", fontWeight: 400, letterSpacing: "-0.2px", color: theme.heroRole }}>
+                Product Designer · Design Engineer
+              </span>
             </div>
+          </div>
 
-            {/* Description */}
-            <p style={{ fontSize: "14px", color: theme.heroBody, lineHeight: 1.5, maxWidth: "508px", margin: 0, transition: "color 0.3s" }}>
-              I craft digital products that balance form, function, and long-term value.
-              My approach blends product strategy, interface design, and front-end craft to deliver experiences that are clear, engaging, and resilient.
-              <br /><br />
-              Currently exploring how AI tools like Claude Code and Antigravity can make creative work faster, more human, and more meaningful.
-            </p>
+          {/* description (fixed-width 508) */}
+          <p style={{ margin: 0, fontFamily: "Inter", fontSize: "14px", fontWeight: 400, lineHeight: 1.5, color: theme.heroBody, maxWidth: "508px", whiteSpace: "pre-line" }}>
+            {"I craft digital products that balance form, function, and long-term value.\nMy approach blends product strategy, interface design, and front-end craft to deliver experiences that are clear, engaging, and resilient.\n\nCurrently exploring how AI tools like Claude Code and Antigravity can make creative work faster, more human, and more meaningful."}
+          </p>
 
-            {/* CTA Buttons */}
-            <div style={{ display: "flex", gap: "8px" }}>
-              {/* View Resume */}
-              <motion.a
-                href="#"
-                whileHover={{ scale: 1.04, backgroundColor: isDark ? "#e8e8e8" : "#333333" }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                style={{ display: "inline-flex", alignItems: "center", gap: "7px", backgroundColor: theme.btnBg, color: theme.btnFg, fontWeight: 500, fontSize: "12px", fontFamily: "var(--font-geist-sans)", padding: "10px 14px", borderRadius: "14px", textDecoration: "none", cursor: "pointer" }}
-              >
-                View Resume
-              </motion.a>
-              {/* Mail */}
-              <motion.a
-                href="mailto:hello@farhandy.co"
-                whileHover={{ scale: 1.08, backgroundColor: isDark ? "#e8e8e8" : "#333333" }}
-                whileTap={{ scale: 0.92, rotate: -8 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                style={{ display: "inline-flex", alignItems: "center", backgroundColor: theme.btnBg, color: theme.btnFg, padding: "10px 14px", borderRadius: "14px", textDecoration: "none", cursor: "pointer" }}
-              >
-                <Mail size={16} />
-              </motion.a>
-              {/* X */}
-              <motion.a
-                href="https://x.com" target="_blank" rel="noreferrer"
-                whileHover={{ scale: 1.08, backgroundColor: isDark ? "#e8e8e8" : "#333333" }}
-                whileTap={{ scale: 0.92, rotate: 8 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                style={{ display: "inline-flex", alignItems: "center", backgroundColor: theme.btnBg, color: theme.btnFg, padding: "10px 14px", borderRadius: "14px", textDecoration: "none", cursor: "pointer" }}
-              >
-                <XIcon />
-              </motion.a>
-            </div>
+          {/* wrap-button */}
+          <div style={{ display: "flex", gap: "8px" }}>
+            <motion.a
+              href="#"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 420, damping: 26 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+                padding: "10px 14px",
+                borderRadius: "14px",
+                background: theme.btnBg,
+                color: theme.btnText,
+                textDecoration: "none",
+                fontFamily: "Inter",
+                fontSize: "12px",
+                fontWeight: 500,
+              }}
+            >
+              View Resume
+            </motion.a>
+
+            <motion.a
+              href="mailto:hello@farhandy.co"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 420, damping: 26 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "10px 14px",
+                borderRadius: "14px",
+                background: theme.btnBg,
+                color: "#000000",
+                textDecoration: "none",
+              }}
+            >
+              <Mail size={18} />
+            </motion.a>
+
+            <motion.a
+              href="https://x.com"
+              target="_blank"
+              rel="noreferrer"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 420, damping: 26 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "10px 14px",
+                borderRadius: "14px",
+                background: theme.btnBg,
+                color: "#000000",
+                textDecoration: "none",
+              }}
+            >
+              <XIcon />
+            </motion.a>
+          </div>
+
+          {/* wrap-copy email */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif", fontSize: "12px", fontWeight: 400, color: "#555555", lineHeight: 1.4 }}>
+            <span>Press</span>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "20px",
+                height: "20px",
+                borderRadius: "6px",
+                fontSize: "12px",
+                fontWeight: 500,
+                color: "#e5e5e5",
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                lineHeight: 1,
+              }}
+            >
+              C
+            </span>
+            <span>to copy my email</span>
           </div>
         </section>
 
-        {/* EXPERIENCE — EFtDV: padding 56 100, gap 8 */}
+        {/* TEAM */}
         <section style={{ padding: "56px 100px", display: "flex", flexDirection: "column", gap: "8px" }}>
-          {/* Team label */}
-          <span style={{ fontSize: "16px", color: theme.textSecondary, fontFamily: "var(--font-plus-jakarta), sans-serif", letterSpacing: "-0.2px", transition: "color 0.3s" }}>
+          <span style={{ fontFamily: "var(--font-plus-jakarta), sans-serif", fontSize: "16px", fontWeight: 400, letterSpacing: "-0.2px", color: theme.heroRole }}>
             Team
           </span>
-          {/* Z7q85: gap 4 between rows */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
             {experience.map((job, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0 12px", borderBottom: `1px solid ${theme.expRowBorder}`, transition: "border-color 0.3s" }}>
-                {/* expRow left: gap 14 */}
+              <div
+                key={i}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "10px 0 12px",
+                  borderBottom: `1px solid ${theme.expRowBorder}`,
+                }}
+              >
                 <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                  {/* icon: 32x32 */}
-                  <div style={{ width: "32px", height: "32px", borderRadius: "4px", background: "#ea580c", flexShrink: 0, overflow: "hidden" }}>
+                  <div style={{ width: "32px", height: "32px", borderRadius: "4px", background: "#ea580c", overflow: "hidden", flexShrink: 0 }}>
                     <img src={job.img} alt={job.company} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   </div>
-                  {/* info stack: gap 2 */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: 500, color: theme.expName, transition: "color 0.3s" }}>{job.company}</span>
-                    <span style={{ fontSize: "12px", color: theme.expRole, transition: "color 0.3s" }}>{job.role}</span>
+                    <span style={{ fontFamily: "Inter", fontSize: "14px", fontWeight: 500, color: theme.textPrimary }}>
+                      {job.company}
+                    </span>
+                    <span style={{ fontFamily: "Inter", fontSize: "12px", fontWeight: 400, color: theme.expRole }}>
+                      {job.role}
+                    </span>
                   </div>
                 </div>
-                <span style={{ fontSize: "14px", color: theme.expPeriod, transition: "color 0.3s" }}>{job.period}</span>
+                <span style={{ fontFamily: "Inter", fontSize: "14px", fontWeight: 400, color: theme.expPeriod }}>
+                  {job.period}
+                </span>
               </div>
             ))}
           </div>
         </section>
 
-        <SectionDivider theme={theme} />
+        {/* WORKS */}
+        <section style={{ padding: "56px 100px", display: "flex", flexDirection: "column", gap: "16px" }}>
+          <span style={{ fontFamily: "var(--font-plus-jakarta), sans-serif", fontSize: "16px", fontWeight: 400, letterSpacing: "-0.2px", color: theme.heroRole }}>
+            Works
+          </span>
 
-        {/* X (TWITTER) */}
-        <WorkSection
-          id={slugify("X (Twitter)")}
-          label="X (Twitter)"
-          category="Product Design Intern · 2023"
-          desc="Worked on core product features at X, focusing on engagement surfaces and creator tools alongside senior designers and PMs across multiple squads."
-          theme={theme}
-        >
-          <motion.div
-            whileHover={{ scale: 1.015 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            style={{ borderRadius: "8px", height: "340px", background: "#000", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", cursor: "pointer" }}
-          >
-            <motion.span
-              whileHover={{ scale: 1.12, rotate: -4 }}
-              whileTap={{ scale: 0.9, rotate: 4 }}
-              transition={{ type: "spring", stiffness: 300, damping: 18 }}
-              style={{ fontSize: "96px", fontWeight: 900, color: "#fff", lineHeight: 1, fontFamily: "serif", display: "block" }}
-            >
-              𝕏
-            </motion.span>
-          </motion.div>
-        </WorkSection>
+          <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+            {works.map((w) => (
+              <div key={w.key} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div
+                  id={slugify(w.label)}
+                  style={{
+                    width: "100%",
+                    height: "340px",
+                    borderRadius: "8px",
+                    background: "#000000",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    overflow: "hidden",
+                  }}
+                >
+                  <span style={{ fontFamily: "Inter", fontSize: "96px", fontWeight: 900, color: "#ffffff", lineHeight: 1 }}>
+                    𝕏
+                  </span>
+                </div>
 
-        <SectionDivider theme={theme} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <div style={{ height: "fit-content", width: "100%" }}>
+                    <span style={{ fontFamily: "Inter", fontSize: "14px", fontWeight: 500, color: "#e0e0e0" }}>
+                      {w.label}
+                    </span>
+                  </div>
+                  <span style={{ fontFamily: "Inter", fontSize: "14px", fontWeight: 400, color: theme.workMeta }}>
+                    {w.period}
+                  </span>
+                  <p style={{ margin: 0, fontFamily: "Inter", fontSize: "12px", fontWeight: 400, lineHeight: 1.65, color: theme.workDesc, maxWidth: "520px" }}>
+                    {w.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-        {/* HANDSHAKE */}
-        <WorkSection
-          id={slugify("Handshake")}
-          label="Handshake"
-          category="Product Design Intern · 2024"
-          desc="Redesigned employer-side job posting flows and candidate discovery surfaces, reducing time-to-publish by 40% through iterative data-driven testing."
-          theme={theme}
-        >
-          <motion.div
-            whileHover={{ scale: 1.015 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            style={{ borderRadius: "8px", height: "340px", background: "#CCFF00", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", cursor: "pointer" }}
-          >
-            <motion.span
-              whileHover={{ scale: 1.1, y: -8 }}
-              whileTap={{ scale: 0.92, y: 4 }}
-              transition={{ type: "spring", stiffness: 300, damping: 18 }}
-              style={{ fontSize: "148px", fontWeight: 900, color: "#000", lineHeight: 1, display: "block" }}
-            >
-              H
-            </motion.span>
-          </motion.div>
-        </WorkSection>
-
-        {/* hsDivider */}
-        <div style={{ height: "1px", background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.08)", transition: "background 0.3s" }} />
+        {/* footerDivider */}
+        <div style={{ height: "1px", background: theme.footerDivider, width: "100%" }} />
 
         {/* FOOTER */}
-        <section style={{ padding: "48px 52px 64px", transition: "border-color 0.3s" }}>
-          <p style={{ fontSize: "13px", color: theme.footerText, lineHeight: 1.7, marginBottom: "18px", maxWidth: "400px", transition: "color 0.3s" }}>
+        <section style={{ width: "100%", padding: "48px 52px 64px", display: "flex", flexDirection: "column" }}>
+          <p style={{ margin: 0, width: "400px", fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif", fontSize: "13px", fontWeight: 400, lineHeight: 1.7, color: theme.footerText }}>
             If you want to know the details of any project or my availability — get in touch
           </p>
+          <div style={{ width: "100%", height: "18px" }} />
           <div style={{ display: "flex", gap: "10px" }}>
-            {["Contact", "Email"].map(label => (
-              <a key={label} href={label === "Email" ? "mailto:hello@farhandy.co" : "#"}
-                style={{ fontSize: "13px", padding: "8px 22px", borderRadius: "100px", border: `1px solid ${theme.footerBtnBorder}`, color: theme.footerBtnFg, textDecoration: "none", transition: "border-color 0.3s, color 0.3s" }}>
-                {label}
-              </a>
-            ))}
+            <a
+              href="#"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "8px 22px",
+                borderRadius: "100px",
+                border: `1px solid ${theme.footerBtnBorder}`,
+                color: theme.footerBtnFg,
+                background: "transparent",
+                textDecoration: "none",
+                fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+                fontSize: "13px",
+                fontWeight: 400,
+                lineHeight: 1,
+              }}
+            >
+              Contact
+            </a>
+            <a
+              href="mailto:hello@farhandy.co"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "8px 22px",
+                borderRadius: "100px",
+                border: `1px solid ${theme.footerBtnBorder}`,
+                color: theme.footerBtnFg,
+                background: "transparent",
+                textDecoration: "none",
+                fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+                fontSize: "13px",
+                fontWeight: 400,
+                lineHeight: 1,
+              }}
+            >
+              Email
+            </a>
           </div>
         </section>
 
       </main>
+
+      <motion.div
+        initial={false}
+        animate={{
+          opacity: copyToastVisible ? 1 : 0,
+          y: copyToastVisible ? 0 : 8,
+        }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        style={{
+          position: "fixed",
+          right: "22px",
+          bottom: "22px",
+          pointerEvents: "none",
+          background: "rgba(24,24,27,0.96)",
+          color: "#e5e5e5",
+          border: "1px solid rgba(255,255,255,0.12)",
+          borderRadius: "10px",
+          padding: "8px 12px",
+          fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+          fontSize: "12px",
+          fontWeight: 500,
+          zIndex: 50,
+        }}
+      >
+        Email copied: hellofarhandy@gmail.com
+      </motion.div>
     </div>
   );
 }
