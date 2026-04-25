@@ -31,28 +31,28 @@ function slugify(s: string) {
 // ─── THEME TOKENS ─────────────────────────────────────────────────────────────
 
 const theme = {
-  bg: "#121212",
-  sidebar: "#121212",
-  sidebarBorder: "#ffffff12",
-  sidebarDivider: "#ffffff0f",
-  textPrimary: "#e5e5e5",
-  textSecondary: "#969696",
-  textMuted: "#484848",
-  navLabel: "#383838",
-  heroName: "#d4d4d4",
-  heroRole: "#969696ff",
-  heroBody: "#ffffffff",
-  expRowBorder: "#282828ff",
-  expRole: "#969696",
-  expPeriod: "#969696",
-  workMeta: "#969696",
-  workDesc: "#555555",
-  footerDivider: "#ffffff0f",
-  footerText: "#555555",
-  footerBtnBorder: "#ffffff1a",
-  footerBtnFg: "#999999",
-  btnBg: "#ffffffff",
-  btnText: "#252525",
+  bg: "var(--background)",
+  sidebar: "var(--sidebar)",
+  sidebarBorder: "var(--sidebar-border)",
+  sidebarDivider: "var(--sidebar-divider)",
+  textPrimary: "var(--text-primary)",
+  textSecondary: "var(--text-secondary)",
+  textMuted: "var(--text-muted)",
+  navLabel: "var(--nav-label)",
+  heroName: "var(--hero-name)",
+  heroRole: "var(--hero-role)",
+  heroBody: "var(--hero-body)",
+  expRowBorder: "var(--exp-row-border)",
+  expRole: "var(--exp-role)",
+  expPeriod: "var(--exp-period)",
+  workMeta: "var(--work-meta)",
+  workDesc: "var(--work-desc)",
+  footerDivider: "var(--footer-divider)",
+  footerText: "var(--footer-text)",
+  footerBtnBorder: "var(--footer-btn-border)",
+  footerBtnFg: "var(--footer-btn-fg)",
+  btnBg: "var(--btn-bg)",
+  btnText: "var(--btn-text)",
 } as const;
 
 // ─── ICONS ───────────────────────────────────────────────────────────────────
@@ -119,7 +119,7 @@ function NavItem({
             style={{
               position: "absolute",
               inset: 0,
-              background: "linear-gradient(90deg, rgba(255,255,255,0.07), rgba(255,255,255,0))",
+              background: "var(--nav-hover-bg, rgba(255,255,255,0.07))",
               pointerEvents: "none",
             }}
             animate={{ opacity: isHovered ? 1 : 0 }}
@@ -256,10 +256,227 @@ function AboutTownCard() {
   );
 }
 
+// ─── COLUMN FOUNTAIN TRANSITION ─────────────────────────────────────────────
+// World-class studio technique: columns erupt from bottom, center-first,
+// like organ pipes firing or a city skyline snapping into existence.
+
+const COL_COUNT = 10;
+
+function ColumnFountainTransition({
+  isTransitioning,
+  nextTheme,
+}: {
+  isTransitioning: boolean;
+  nextTheme: "dark" | "light";
+}) {
+  const bg = nextTheme === "dark" ? "#09090b" : "#fafafa";
+  // Glowing accent line on the tip of each column
+  const tipGlow = nextTheme === "dark"
+    ? "rgba(255,255,255,0.55)"
+    : "rgba(24,24,27,0.35)";
+  // Subtle glow cap gradient just below the tip
+  const capGlow = nextTheme === "dark"
+    ? "rgba(255,255,255,0.07)"
+    : "rgba(0,0,0,0.04)";
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        pointerEvents: "none",
+        display: "flex",
+        alignItems: "flex-end",
+        overflow: "hidden",
+      }}
+    >
+      {Array.from({ length: COL_COUNT }).map((_, i) => {
+        const center = (COL_COUNT - 1) / 2;
+        const distFromCenter = Math.abs(i - center);
+        // Center columns fire first, edges follow — fountain effect
+        const delay = (distFromCenter / center) * 0.14;
+        // Deterministic micro-variation in timing (no Math.random for SSR safety)
+        const microJitter = (i % 3) * 0.01;
+
+        return (
+          <motion.div
+            key={i}
+            initial={{ y: "101%" }}
+            animate={{
+              y: isTransitioning ? ["101%", "0%", "0%", "101%"] : "101%",
+            }}
+            transition={{
+              y: {
+                duration: 1.05,
+                delay: delay + microJitter,
+                times: [0, 0.42, 0.58, 1.0],
+                ease: [
+                  [0.76, 0, 0.24, 1],  // rise: expo decel — snaps to top
+                  "linear",             // hold: completely still
+                  [0.76, 0, 0.24, 1],  // retract: expo decel — snaps away
+                ],
+              },
+            }}
+            style={{
+              flex: 1,
+              height: "100%",
+              position: "relative",
+              // Slight alternating shade for column depth —
+              // even columns are the pure bg, odd are 2% lighter/darker
+              background: i % 2 === 0 ? bg : bg,
+              backgroundImage: `linear-gradient(180deg, ${capGlow} 0%, transparent 12%, transparent 100%)`,
+            }}
+          >
+            {/* Razor-sharp glowing tip line at the very top of each column */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "2px",
+                background: tipGlow,
+                boxShadow: nextTheme === "dark"
+                  ? `0 0 12px 1px rgba(255,255,255,0.3), 0 0 30px 4px rgba(255,255,255,0.06)`
+                  : `0 0 12px 1px rgba(0,0,0,0.12), 0 0 24px 2px rgba(0,0,0,0.04)`,
+              }}
+            />
+            {/* Hairline column divider — visible only on the way up */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0, bottom: 0,
+                right: 0,
+                width: "1px",
+                background: nextTheme === "dark"
+                  ? "rgba(255,255,255,0.04)"
+                  : "rgba(0,0,0,0.03)",
+              }}
+            />
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Theme Toggle Component
+function ThemeToggle({ themeMode, toggleTheme }: { themeMode: "dark" | "light"; toggleTheme: () => void }) {
+  return (
+    <div style={{ padding: "16px 20px", marginTop: "auto" }}>
+      <button
+        onClick={toggleTheme}
+        style={{
+          background: "transparent",
+          border: "none",
+          padding: 0,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          color: theme.textMuted,
+          fontSize: "12px",
+          fontFamily: "Inter",
+          fontWeight: 500,
+          outline: "none",
+        }}
+      >
+        <div
+          style={{
+            width: "32px",
+            height: "32px",
+            borderRadius: "10px",
+            background: "rgba(255,255,255,0.03)",
+            border: `1px solid ${theme.sidebarBorder}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <motion.div
+            initial={false}
+            animate={{
+              y: themeMode === "dark" ? 0 : 40,
+              rotate: themeMode === "dark" ? 0 : 90,
+              opacity: themeMode === "dark" ? 1 : 0,
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            style={{ position: "absolute" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          </motion.div>
+          <motion.div
+            initial={false}
+            animate={{
+              y: themeMode === "light" ? 0 : -40,
+              rotate: themeMode === "light" ? 0 : -90,
+              opacity: themeMode === "light" ? 1 : 0,
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            style={{ position: "absolute" }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          </motion.div>
+        </div>
+        <motion.span
+          animate={{ color: theme.textSecondary }}
+          transition={{ duration: 0.2 }}
+        >
+          {themeMode === "dark" ? "Dark Mode" : "Light Mode"}
+        </motion.span>
+      </button>
+    </div>
+  );
+}
+
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
   const [copyToastVisible, setCopyToastVisible] = useState(false);
+  const [themeMode, setThemeMode] = useState<"dark" | "light">("dark");
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
+    if (savedTheme) {
+      setThemeMode(savedTheme);
+    } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+      setThemeMode("light");
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", themeMode);
+    localStorage.setItem("theme", themeMode);
+  }, [themeMode]);
+
+  const toggleTheme = () => {
+    if (isTransitioning) return;
+
+    setIsTransitioning(true);
+    // Last column fully rises at: maxDelay(0.14) + jitter(0.02) + rise_phase(0.42 * 1.05) ≈ 0.60s
+    // Switch theme at 0.62s (safely inside the hold window)
+    setTimeout(() => {
+      setThemeMode(prev => prev === "dark" ? "light" : "dark");
+      // All columns retracted by ~1.35s total. Add 100ms buffer.
+      setTimeout(() => setIsTransitioning(false), 750);
+    }, 620);
+  };
 
   useEffect(() => {
     const email = "hellofarhandy@gmail.com";
@@ -334,10 +551,26 @@ export default function Home() {
 
           <NavItem href="https://linkedin.com/in/farhandyakbar" external theme={theme}>LinkedIn</NavItem>
         </nav>
+
+        <ThemeToggle themeMode={themeMode} toggleTheme={toggleTheme} />
       </aside>
 
       {/* ── MAIN ── */}
-      <main style={{ flex: 1, minWidth: 0, marginLeft: "197px" }}>
+      <motion.main
+        animate={{
+          opacity: isTransitioning ? 0 : 1,
+          y: isTransitioning ? 6 : 0,
+        }}
+        transition={{
+          opacity: { duration: 0.25, ease: "easeInOut" },
+          y: {
+            duration: 0.45,
+            ease: [0.22, 1, 0.36, 1],
+            delay: isTransitioning ? 0 : 0.1,
+          },
+        }}
+        style={{ flex: 1, minWidth: 0, marginLeft: "197px" }}
+      >
 
         {/* HERO */}
         <section style={{ padding: "80px 100px 56px", display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -413,7 +646,7 @@ export default function Home() {
                 padding: "10px 14px",
                 borderRadius: "14px",
                 background: theme.btnBg,
-                color: "#000000",
+                color: theme.btnText,
                 textDecoration: "none",
               }}
             >
@@ -434,7 +667,7 @@ export default function Home() {
                 padding: "10px 14px",
                 borderRadius: "14px",
                 background: theme.btnBg,
-                color: "#000000",
+                color: theme.btnText,
                 textDecoration: "none",
               }}
             >
@@ -443,7 +676,7 @@ export default function Home() {
           </div>
 
           {/* wrap-copy email */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif", fontSize: "12px", fontWeight: 400, color: "#555555", lineHeight: 1.4 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif", fontSize: "12px", fontWeight: 400, color: theme.textMuted, lineHeight: 1.4 }}>
             <span>Press</span>
             <span
               style={{
@@ -455,9 +688,9 @@ export default function Home() {
                 borderRadius: "6px",
                 fontSize: "12px",
                 fontWeight: 500,
-                color: "#e5e5e5",
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.12)",
+                color: theme.textPrimary,
+                background: "var(--copy-key-bg, rgba(255,255,255,0.06))",
+                border: `1px solid ${theme.sidebarBorder}`,
                 lineHeight: 1,
               }}
             >
@@ -535,7 +768,7 @@ export default function Home() {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   <div style={{ height: "fit-content", width: "100%" }}>
-                    <span style={{ fontFamily: "Inter", fontSize: "14px", fontWeight: 500, color: "#e0e0e0" }}>
+                    <span style={{ fontFamily: "Inter", fontSize: "14px", fontWeight: 500, color: theme.textPrimary }}>
                       {w.label}
                     </span>
                   </div>
@@ -604,7 +837,7 @@ export default function Home() {
           </div>
         </section>
 
-      </main>
+      </motion.main>
 
       <motion.div
         initial={false}
@@ -618,19 +851,26 @@ export default function Home() {
           right: "22px",
           bottom: "22px",
           pointerEvents: "none",
-          background: "rgba(24,24,27,0.96)",
-          color: "#e5e5e5",
-          border: "1px solid rgba(255,255,255,0.12)",
+          background: theme.btnBg,
+          color: theme.btnText,
+          border: `1px solid ${theme.sidebarBorder}`,
           borderRadius: "10px",
           padding: "8px 12px",
           fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
           fontSize: "12px",
           fontWeight: 500,
           zIndex: 50,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
         }}
       >
         Email copied: hellofarhandy@gmail.com
       </motion.div>
+
+      {/* Column Fountain Theme Transition */}
+      <ColumnFountainTransition
+        isTransitioning={isTransitioning}
+        nextTheme={themeMode === "dark" ? "light" : "dark"}
+      />
     </div>
   );
 }
