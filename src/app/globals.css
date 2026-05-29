@@ -51,30 +51,24 @@
   --footer-text: #71717a;
   --footer-btn-border: #e4e4e7;
   --footer-btn-fg: #71717a;
-  --btn-bg: #18181b; /* Replaced black with deep Zinc gray */
+  --btn-bg: #18181b;
   --btn-text: #fafafa;
   --nav-hover-bg: linear-gradient(90deg, rgba(0,0,0,0.03), rgba(0,0,0,0));
   --copy-key-bg: #f4f4f5;
   --work-container-bg: #18181b;
 }
 
-html,
-body,
-aside,
-main,
-section,
-nav,
-div,
-span,
-a,
-button,
-p {
-  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-              fill 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-              stroke 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+/* ─── VIEW TRANSITIONS API ────────────────────────────────────── */
+/* Disable the default cross-fade — we drive our own clipPath animation */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Hide the old snapshot instantly; only the new one animates in */
+::view-transition-old(root) {
+  opacity: 0;
 }
 
 body {

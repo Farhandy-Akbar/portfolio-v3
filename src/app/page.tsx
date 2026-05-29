@@ -1,8 +1,9 @@
 "use client";
 
-import { ExternalLink, Mail } from "lucide-react";
-import { motion } from "framer-motion";
+import { ExternalLink, Mail, Sun, Moon } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -256,117 +257,21 @@ function AboutTownCard() {
   );
 }
 
-// ─── COLUMN FOUNTAIN TRANSITION ─────────────────────────────────────────────
-// World-class studio technique: columns erupt from bottom, center-first,
-// like organ pipes firing or a city skyline snapping into existence.
-
-const COL_COUNT = 10;
-
-function ColumnFountainTransition({
-  isTransitioning,
-  nextTheme,
+// Theme Toggle Component — toggles.dev style
+function ThemeToggle({
+  themeMode,
+  toggleTheme,
 }: {
-  isTransitioning: boolean;
-  nextTheme: "dark" | "light";
+  themeMode: "dark" | "light";
+  toggleTheme: () => void;
 }) {
-  const bg = nextTheme === "dark" ? "#09090b" : "#fafafa";
-  // Glowing accent line on the tip of each column
-  const tipGlow = nextTheme === "dark"
-    ? "rgba(255,255,255,0.55)"
-    : "rgba(24,24,27,0.35)";
-  // Subtle glow cap gradient just below the tip
-  const capGlow = nextTheme === "dark"
-    ? "rgba(255,255,255,0.07)"
-    : "rgba(0,0,0,0.04)";
+  const isDark = themeMode === "dark";
 
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9999,
-        pointerEvents: "none",
-        display: "flex",
-        alignItems: "flex-end",
-        overflow: "hidden",
-      }}
-    >
-      {Array.from({ length: COL_COUNT }).map((_, i) => {
-        const center = (COL_COUNT - 1) / 2;
-        const distFromCenter = Math.abs(i - center);
-        // Center columns fire first, edges follow — fountain effect
-        const delay = (distFromCenter / center) * 0.14;
-        // Deterministic micro-variation in timing (no Math.random for SSR safety)
-        const microJitter = (i % 3) * 0.01;
-
-        return (
-          <motion.div
-            key={i}
-            initial={{ y: "101%" }}
-            animate={{
-              y: isTransitioning ? ["101%", "0%", "0%", "101%"] : "101%",
-            }}
-            transition={{
-              y: {
-                duration: 1.05,
-                delay: delay + microJitter,
-                times: [0, 0.42, 0.58, 1.0],
-                ease: [
-                  [0.76, 0, 0.24, 1],  // rise: expo decel — snaps to top
-                  "linear",             // hold: completely still
-                  [0.76, 0, 0.24, 1],  // retract: expo decel — snaps away
-                ],
-              },
-            }}
-            style={{
-              flex: 1,
-              height: "100%",
-              position: "relative",
-              // Slight alternating shade for column depth —
-              // even columns are the pure bg, odd are 2% lighter/darker
-              background: i % 2 === 0 ? bg : bg,
-              backgroundImage: `linear-gradient(180deg, ${capGlow} 0%, transparent 12%, transparent 100%)`,
-            }}
-          >
-            {/* Razor-sharp glowing tip line at the very top of each column */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "2px",
-                background: tipGlow,
-                boxShadow: nextTheme === "dark"
-                  ? `0 0 12px 1px rgba(255,255,255,0.3), 0 0 30px 4px rgba(255,255,255,0.06)`
-                  : `0 0 12px 1px rgba(0,0,0,0.12), 0 0 24px 2px rgba(0,0,0,0.04)`,
-              }}
-            />
-            {/* Hairline column divider — visible only on the way up */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0, bottom: 0,
-                right: 0,
-                width: "1px",
-                background: nextTheme === "dark"
-                  ? "rgba(255,255,255,0.04)"
-                  : "rgba(0,0,0,0.03)",
-              }}
-            />
-          </motion.div>
-        );
-      })}
-    </div>
-  );
-}
-
-// Theme Toggle Component
-function ThemeToggle({ themeMode, toggleTheme }: { themeMode: "dark" | "light"; toggleTheme: () => void }) {
   return (
     <div style={{ padding: "16px 20px", marginTop: "auto" }}>
       <button
         onClick={toggleTheme}
+        aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
         style={{
           background: "transparent",
           border: "none",
@@ -375,7 +280,6 @@ function ThemeToggle({ themeMode, toggleTheme }: { themeMode: "dark" | "light"; 
           display: "flex",
           alignItems: "center",
           gap: "10px",
-          color: theme.textMuted,
           fontSize: "12px",
           fontFamily: "Inter",
           fontWeight: 500,
@@ -384,10 +288,10 @@ function ThemeToggle({ themeMode, toggleTheme }: { themeMode: "dark" | "light"; 
       >
         <div
           style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "10px",
-            background: "rgba(255,255,255,0.03)",
+            width: "36px",
+            height: "36px",
+            borderRadius: "11px",
+            background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
             border: `1px solid ${theme.sidebarBorder}`,
             display: "flex",
             alignItems: "center",
@@ -396,48 +300,65 @@ function ThemeToggle({ themeMode, toggleTheme }: { themeMode: "dark" | "light"; 
             overflow: "hidden",
           }}
         >
-          <motion.div
-            initial={false}
-            animate={{
-              y: themeMode === "dark" ? 0 : 40,
-              rotate: themeMode === "dark" ? 0 : 90,
-              opacity: themeMode === "dark" ? 1 : 0,
+          {/* toggles.dev "around" style SVG */}
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 32 32"
+            fill="currentColor"
+            style={{
+              color: isDark ? "#facc15" : "#1e3a5f",
+              transition: "transform 500ms ease",
+              transform: isDark ? "rotate(-90deg)" : "rotate(0deg)",
             }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            style={{ position: "absolute" }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          </motion.div>
-          <motion.div
-            initial={false}
-            animate={{
-              y: themeMode === "light" ? 0 : -40,
-              rotate: themeMode === "light" ? 0 : -90,
-              opacity: themeMode === "light" ? 1 : 0,
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            style={{ position: "absolute" }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          </motion.div>
+            <defs>
+              <clipPath id="theme-clip">
+                <path
+                  d={isDark ? "M-12 -14h42v30a1 1 0 00-16 13H0Z" : "M0 0h42v30a1 1 0 00-16 13H0Z"}
+                  style={{
+                    transition: "d 500ms ease",
+                  }}
+                />
+              </clipPath>
+            </defs>
+            <g clipPath="url(#theme-clip)">
+              <circle
+                cx="16"
+                cy="16"
+                r="8.4"
+                style={{
+                  transformOrigin: "center",
+                  transition: "transform 500ms ease",
+                  transform: isDark ? "scale(1.4)" : "scale(1)",
+                }}
+              />
+              <g
+                style={{
+                  transformOrigin: "center",
+                  transition: "transform 400ms ease, opacity 400ms ease",
+                  transform: isDark ? "scale(0)" : "scale(1)",
+                  opacity: isDark ? 0 : 1,
+                }}
+              >
+                <circle cx="16" cy="3.3" r="2.3" />
+                <circle cx="27" cy="9.7" r="2.3" />
+                <circle cx="27" cy="22.3" r="2.3" />
+                <circle cx="16" cy="28.7" r="2.3" />
+                <circle cx="5" cy="22.3" r="2.3" />
+                <circle cx="5" cy="9.7" r="2.3" />
+              </g>
+            </g>
+          </svg>
         </div>
         <motion.span
-          animate={{ color: theme.textSecondary }}
-          transition={{ duration: 0.2 }}
+          key={themeMode}
+          initial={{ y: 6, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          style={{ color: theme.textSecondary }}
         >
-          {themeMode === "dark" ? "Dark Mode" : "Light Mode"}
+          {isDark ? "Dark Mode" : "Light Mode"}
         </motion.span>
       </button>
     </div>
@@ -449,7 +370,6 @@ function ThemeToggle({ themeMode, toggleTheme }: { themeMode: "dark" | "light"; 
 export default function Home() {
   const [copyToastVisible, setCopyToastVisible] = useState(false);
   const [themeMode, setThemeMode] = useState<"dark" | "light">("dark");
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
@@ -465,17 +385,27 @@ export default function Home() {
     localStorage.setItem("theme", themeMode);
   }, [themeMode]);
 
-  const toggleTheme = () => {
-    if (isTransitioning) return;
+  const toggleTheme = async () => {
+    const nextTheme = themeMode === "dark" ? "light" : "dark";
 
-    setIsTransitioning(true);
-    // Last column fully rises at: maxDelay(0.14) + jitter(0.02) + rise_phase(0.42 * 1.05) ≈ 0.60s
-    // Switch theme at 0.62s (safely inside the hold window)
-    setTimeout(() => {
-      setThemeMode(prev => prev === "dark" ? "light" : "dark");
-      // All columns retracted by ~1.35s total. Add 100ms buffer.
-      setTimeout(() => setIsTransitioning(false), 750);
-    }, 620);
+    const startViewTransition = (
+      document as Document & {
+        startViewTransition?: (callback: () => void) => { ready: Promise<void> };
+      }
+    ).startViewTransition;
+
+    if (!startViewTransition) {
+      setThemeMode(nextTheme);
+      return;
+    }
+
+    await startViewTransition.call(document, () => {
+      flushSync(() => {
+        setThemeMode(nextTheme);
+        document.documentElement.setAttribute("data-theme", nextTheme);
+        localStorage.setItem("theme", nextTheme);
+      });
+    }).ready;
   };
 
   useEffect(() => {
@@ -556,19 +486,7 @@ export default function Home() {
       </aside>
 
       {/* ── MAIN ── */}
-      <motion.main
-        animate={{
-          opacity: isTransitioning ? 0 : 1,
-          y: isTransitioning ? 6 : 0,
-        }}
-        transition={{
-          opacity: { duration: 0.25, ease: "easeInOut" },
-          y: {
-            duration: 0.45,
-            ease: [0.22, 1, 0.36, 1],
-            delay: isTransitioning ? 0 : 0.1,
-          },
-        }}
+      <main
         style={{ flex: 1, minWidth: 0, marginLeft: "197px" }}
       >
 
@@ -837,7 +755,7 @@ export default function Home() {
           </div>
         </section>
 
-      </motion.main>
+      </main>
 
       <motion.div
         initial={false}
@@ -866,11 +784,7 @@ export default function Home() {
         Email copied: hellofarhandy@gmail.com
       </motion.div>
 
-      {/* Column Fountain Theme Transition */}
-      <ColumnFountainTransition
-        isTransitioning={isTransitioning}
-        nextTheme={themeMode === "dark" ? "light" : "dark"}
-      />
+
     </div>
   );
 }
