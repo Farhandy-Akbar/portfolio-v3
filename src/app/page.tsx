@@ -498,12 +498,8 @@ export default function Home() {
         </div>
       </aside>
 
-      <div id="smooth-wrapper" style={{ overflow: "hidden" }}>
-        <div id="smooth-content">
       {/* ── MAIN ── */}
-      <main
-        style={{ flex: 1, minWidth: 0, marginLeft: "197px", minHeight: "100vh", background: theme.bg, color: theme.textPrimary, fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif", position: "relative", zIndex: 1 }}
-      >
+      <main style={{ flex: 1, minWidth: 0, marginLeft: "197px", minHeight: "100vh", background: theme.bg, color: theme.textPrimary, fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif", position: "relative", zIndex: 1 }}>
 
         {/* HERO */}
         <section style={{ padding: "80px 100px 56px", display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -539,7 +535,7 @@ export default function Home() {
 
           {/* description (fixed-width 508) */}
           <p style={{ margin: 0, fontFamily: "Inter", fontSize: "14px", fontWeight: 400, lineHeight: 1.5, color: theme.heroBody, maxWidth: "508px", whiteSpace: "pre-line" }}>
-            {"I craft digital products that balance form, function, and long-term value.\nMy approach blends product strategy, interface design, and front-end craft to deliver experiences that are clear, engaging, and resilient.\n\nCurrently exploring how AI tools like Claude Code and Antigravity can make creative work faster, more human, and more meaningful."}
+            {"I craft digital products that balance form, function, and long-term value.\nMy approach blends product strategy, interface design, and front-end craft to deliver experiences that are clear, engaging, and resilient\n\nCurrently leveraging AI to move faster and explore new possibilities."}
           </p>
 
           {/* wrap-button */}
@@ -799,8 +795,6 @@ export default function Home() {
         Email copied: hellofarhandy@gmail.com
       </motion.div>
 
-        </div>
-      </div>
     </>
   );
 }

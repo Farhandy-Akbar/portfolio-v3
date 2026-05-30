@@ -1,27 +1,28 @@
 "use client";
 
 import { useEffect } from "react";
-import gsap from "gsap";
-import { ScrollSmoother } from "gsap/ScrollSmoother";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollSmoother, ScrollTrigger);
-}
 
 export default function SmoothScroll() {
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    // Enable smooth scrolling for anchor links
+    document.documentElement.style.scrollBehavior = "smooth";
 
-    const smoother = ScrollSmoother.create({
-      smooth: 1.5,
-      effects: true,
-      smoothTouch: 0.1,
-      normalizeScroll: true,
-    });
+    // Optional: Add custom easing for smoother feel
+    const style = document.createElement("style");
+    style.textContent = `
+      * {
+        scroll-behavior: smooth;
+      }
+      
+      html {
+        scroll-behavior: smooth;
+      }
+    `;
+    document.head.appendChild(style);
 
     return () => {
-      smoother?.kill();
+      document.documentElement.style.scrollBehavior = "";
+      style.remove();
     };
   }, []);
 
