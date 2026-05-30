@@ -4,6 +4,11 @@ import { ExternalLink, Mail, Sun, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { flushSync } from "react-dom";
+import SmoothScroll from "@/components/SmoothScroll";
+import Background3D from "@/components/Background3D";
+import GradientOverlay from "@/components/GradientOverlay";
+import CustomCursor from "@/components/CustomCursor";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -370,6 +375,8 @@ function ThemeToggle({
 export default function Home() {
   const [copyToastVisible, setCopyToastVisible] = useState(false);
   const [themeMode, setThemeMode] = useState<"dark" | "light">("dark");
+  const teamRef = useScrollAnimation();
+  const worksRef = useScrollAnimation();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
@@ -458,8 +465,12 @@ export default function Home() {
   }, []);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: theme.bg, color: theme.textPrimary, fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" }}>
-
+    <>
+      <SmoothScroll />
+      <Background3D />
+      <GradientOverlay />
+      <CustomCursor />
+      
       {/* ── SIDEBAR ── */}
       <aside style={{ width: "196px", minWidth: "196px", position: "fixed", top: 0, left: 0, height: "100vh", display: "flex", flexDirection: "column", borderRight: `1px solid ${theme.sidebarBorder}`, overflowY: "auto", zIndex: 10, background: theme.sidebar }}>
         <nav style={{ padding: "16px 12px", display: "flex", flexDirection: "column", gap: "1px", flex: 1 }}>
@@ -482,12 +493,16 @@ export default function Home() {
           <NavItem href="https://linkedin.com/in/farhandyakbar" external theme={theme}>LinkedIn</NavItem>
         </nav>
 
-        <ThemeToggle themeMode={themeMode} toggleTheme={toggleTheme} />
+        <div style={{ marginTop: "auto", position: "sticky", bottom: 0, background: theme.sidebar, paddingTop: "8px" }}>
+          <ThemeToggle themeMode={themeMode} toggleTheme={toggleTheme} />
+        </div>
       </aside>
 
+      <div id="smooth-wrapper" style={{ overflow: "hidden" }}>
+        <div id="smooth-content">
       {/* ── MAIN ── */}
       <main
-        style={{ flex: 1, minWidth: 0, marginLeft: "197px" }}
+        style={{ flex: 1, minWidth: 0, marginLeft: "197px", minHeight: "100vh", background: theme.bg, color: theme.textPrimary, fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif", position: "relative", zIndex: 1 }}
       >
 
         {/* HERO */}
@@ -619,7 +634,7 @@ export default function Home() {
         </section>
 
         {/* TEAM */}
-        <section style={{ padding: "56px 100px", display: "flex", flexDirection: "column", gap: "8px" }}>
+        <section ref={teamRef as any} style={{ padding: "56px 100px", display: "flex", flexDirection: "column", gap: "8px" }}>
           <span style={{ fontFamily: "var(--font-plus-jakarta), sans-serif", fontSize: "16px", fontWeight: 400, letterSpacing: "-0.2px", color: theme.heroRole }}>
             Team
           </span>
@@ -658,7 +673,7 @@ export default function Home() {
         </section>
 
         {/* WORKS */}
-        <section style={{ padding: "56px 100px", display: "flex", flexDirection: "column", gap: "16px" }}>
+        <section ref={worksRef as any} style={{ padding: "56px 100px", display: "flex", flexDirection: "column", gap: "16px" }}>
           <span style={{ fontFamily: "var(--font-plus-jakarta), sans-serif", fontSize: "16px", fontWeight: 400, letterSpacing: "-0.2px", color: theme.heroRole }}>
             Works
           </span>
@@ -784,7 +799,8 @@ export default function Home() {
         Email copied: hellofarhandy@gmail.com
       </motion.div>
 
-
-    </div>
+        </div>
+      </div>
+    </>
   );
 }
