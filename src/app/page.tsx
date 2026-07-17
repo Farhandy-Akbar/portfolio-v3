@@ -392,6 +392,20 @@ export default function Home() {
     localStorage.setItem("theme", themeMode);
   }, [themeMode]);
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "d" || e.key === "D") {
+        const target = e.target as HTMLElement | null;
+        if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+          return;
+        }
+        toggleTheme();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
+
   const toggleTheme = async () => {
     const nextTheme = themeMode === "dark" ? "light" : "dark";
 
@@ -475,20 +489,6 @@ export default function Home() {
       <aside style={{ width: "196px", minWidth: "196px", position: "fixed", top: 0, left: 0, height: "100vh", display: "flex", flexDirection: "column", borderRight: `1px solid ${theme.sidebarBorder}`, overflowY: "auto", zIndex: 10, background: theme.sidebar }}>
         <nav style={{ padding: "16px 12px", display: "flex", flexDirection: "column", gap: "1px", flex: 1 }}>
           <NavItem href="#" active theme={theme}>Home</NavItem>
-
-          <div style={{ fontFamily: "var(--font-inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif", fontSize: "10px", color: theme.navLabel, padding: "8px 8px 2px", textTransform: "uppercase", letterSpacing: "0.1px", fontWeight: 600 }}>
-            Work
-          </div>
-
-          {workNav.map(name => (
-            <NavItem key={name} href={`#${slugify(name)}`} isWork theme={theme}>{name}</NavItem>
-          ))}
-
-          <div style={{ height: "10px" }} />
-
-          {["About", "Brief"].map(name => (
-            <NavItem key={name} href="#" theme={theme}>{name}</NavItem>
-          ))}
 
           <NavItem href="https://linkedin.com/in/farhandyakbar" external theme={theme}>LinkedIn</NavItem>
         </nav>
@@ -668,50 +668,52 @@ export default function Home() {
           </div>
         </section>
 
-        {/* WORKS */}
-        <section ref={worksRef as any} style={{ padding: "56px 100px", display: "flex", flexDirection: "column", gap: "16px" }}>
-          <span style={{ fontFamily: "var(--font-plus-jakarta), sans-serif", fontSize: "16px", fontWeight: 400, letterSpacing: "-0.2px", color: theme.heroRole }}>
-            Works
-          </span>
+        {/* WORKS (hidden — still dummy). To restore: change `false` below to `true`. */}
+        {false && (
+          <section ref={worksRef as any} style={{ padding: "56px 100px", display: "flex", flexDirection: "column", gap: "16px" }}>
+            <span style={{ fontFamily: "var(--font-plus-jakarta), sans-serif", fontSize: "16px", fontWeight: 400, letterSpacing: "-0.2px", color: theme.heroRole }}>
+              Works
+            </span>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
-            {works.map((w) => (
-              <div key={w.key} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                <div
-                  id={slugify(w.label)}
-                  style={{
-                    width: "100%",
-                    height: "340px",
-                    borderRadius: "8px",
-                    background: "#000000",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    overflow: "hidden",
-                  }}
-                >
-                  <span style={{ fontFamily: "Inter", fontSize: "96px", fontWeight: 900, color: "#ffffff", lineHeight: 1 }}>
-                    𝕏
-                  </span>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <div style={{ height: "fit-content", width: "100%" }}>
-                    <span style={{ fontFamily: "Inter", fontSize: "14px", fontWeight: 500, color: theme.textPrimary }}>
-                      {w.label}
+            <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+              {works.map((w) => (
+                <div key={w.key} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div
+                    id={slugify(w.label)}
+                    style={{
+                      width: "100%",
+                      height: "340px",
+                      borderRadius: "8px",
+                      background: "#000000",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <span style={{ fontFamily: "Inter", fontSize: "96px", fontWeight: 900, color: "#ffffff", lineHeight: 1 }}>
+                      𝕏
                     </span>
                   </div>
-                  <span style={{ fontFamily: "Inter", fontSize: "14px", fontWeight: 400, color: theme.workMeta }}>
-                    {w.period}
-                  </span>
-                  <p style={{ margin: 0, fontFamily: "Inter", fontSize: "12px", fontWeight: 400, lineHeight: 1.65, color: theme.workDesc, maxWidth: "520px" }}>
-                    {w.desc}
-                  </p>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    <div style={{ height: "fit-content", width: "100%" }}>
+                      <span style={{ fontFamily: "Inter", fontSize: "14px", fontWeight: 500, color: theme.textPrimary }}>
+                        {w.label}
+                      </span>
+                    </div>
+                    <span style={{ fontFamily: "Inter", fontSize: "14px", fontWeight: 400, color: theme.workMeta }}>
+                      {w.period}
+                    </span>
+                    <p style={{ margin: 0, fontFamily: "Inter", fontSize: "12px", fontWeight: 400, lineHeight: 1.65, color: theme.workDesc, maxWidth: "520px" }}>
+                      {w.desc}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* footerDivider */}
         <div style={{ height: "1px", background: theme.footerDivider, width: "100%" }} />
