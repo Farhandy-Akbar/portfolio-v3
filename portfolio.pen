@@ -1,5 +1,5 @@
 {
-  "version": "2.9",
+  "version": "2.14",
   "children": [
     {
       "type": "frame",
@@ -283,13 +283,13 @@
                       "fontWeight": "normal"
                     },
                     {
-                      "type": "icon_font",
+                      "type": "icon",
                       "id": "4D0Pz",
                       "name": "linkedinIcon",
                       "width": 10,
                       "height": 10,
-                      "iconFontName": "external-link",
-                      "iconFontFamily": "lucide",
+                      "icon": "external-link",
+                      "library": "lucide",
                       "fill": "#484848"
                     }
                   ]
@@ -498,13 +498,10 @@
                               "geometry": "M0 0l5 3.5 5-3.5",
                               "width": 10,
                               "height": 3.5,
-                              "stroke": {
-                                "align": "center",
-                                "thickness": 1.5,
-                                "join": "round",
-                                "cap": "round",
-                                "fill": "#000000"
-                              }
+                              "stroke": "#000000",
+                              "strokeWidth": 1.5,
+                              "strokeLinejoin": "round",
+                              "strokeLinecap": "round"
                             },
                             {
                               "type": "path",
@@ -514,11 +511,8 @@
                               "geometry": "M0 12l0-10c0-1.10457 0.89543-2 2-2l16 0c1.10457 0 2 0.89543 2 2l0 10c0 1.10457-0.89543 2-2 2l-16 0c-1.10457 0-2-0.89543-2-2z",
                               "width": 20,
                               "height": 14,
-                              "stroke": {
-                                "align": "center",
-                                "thickness": 1.5,
-                                "fill": "#000000"
-                              }
+                              "stroke": "#000000",
+                              "strokeWidth": 1.5
                             }
                           ]
                         }
@@ -553,13 +547,10 @@
                               "geometry": "M0 0l5 3.5 5-3.5",
                               "width": 10,
                               "height": 3.5,
-                              "stroke": {
-                                "align": "center",
-                                "thickness": 1.5,
-                                "join": "round",
-                                "cap": "round",
-                                "fill": "#000000"
-                              }
+                              "stroke": "#000000",
+                              "strokeWidth": 1.5,
+                              "strokeLinejoin": "round",
+                              "strokeLinecap": "round"
                             },
                             {
                               "type": "path",
@@ -569,11 +560,8 @@
                               "geometry": "M0 12l0-10c0-1.10457 0.89543-2 2-2l16 0c1.10457 0 2 0.89543 2 2l0 10c0 1.10457-0.89543 2-2 2l-16 0c-1.10457 0-2-0.89543-2-2z",
                               "width": 20,
                               "height": 14,
-                              "stroke": {
-                                "align": "center",
-                                "thickness": 1.5,
-                                "fill": "#000000"
-                              }
+                              "stroke": "#000000",
+                              "strokeWidth": 1.5
                             }
                           ]
                         }
@@ -655,13 +643,11 @@
                       "id": "KVz6K",
                       "name": "expRow1",
                       "width": "fill_container",
-                      "stroke": {
-                        "align": "outside",
-                        "thickness": {
-                          "bottom": 1
-                        },
-                        "fill": "#282828ff"
+                      "stroke": "#282828ff",
+                      "strokeWidth": {
+                        "bottom": 1
                       },
+                      "strokeAlignment": "outer",
                       "padding": [
                         10,
                         0,
@@ -753,13 +739,11 @@
                       "id": "3rYBS",
                       "name": "expRow2",
                       "width": "fill_container",
-                      "stroke": {
-                        "align": "outside",
-                        "thickness": {
-                          "bottom": 1
-                        },
-                        "fill": "#282828ff"
+                      "stroke": "#282828ff",
+                      "strokeWidth": {
+                        "bottom": 1
                       },
+                      "strokeAlignment": "outer",
                       "padding": [
                         10,
                         0,
@@ -850,13 +834,11 @@
                       "id": "890Hx",
                       "name": "expRow3",
                       "width": "fill_container",
-                      "stroke": {
-                        "align": "outside",
-                        "thickness": {
-                          "bottom": 1
-                        },
-                        "fill": "#282828ff"
+                      "stroke": "#282828ff",
+                      "strokeWidth": {
+                        "bottom": 1
                       },
+                      "strokeAlignment": "outer",
                       "padding": [
                         10,
                         0,
@@ -948,13 +930,11 @@
                       "id": "EJmRq",
                       "name": "expRow3",
                       "width": "fill_container",
-                      "stroke": {
-                        "align": "outside",
-                        "thickness": {
-                          "bottom": 1
-                        },
-                        "fill": "#282828ff"
+                      "stroke": "#282828ff",
+                      "strokeWidth": {
+                        "bottom": 1
                       },
+                      "strokeAlignment": "outer",
                       "padding": [
                         10,
                         0,
@@ -1045,13 +1025,11 @@
                       "id": "6zUlG",
                       "name": "expRow3",
                       "width": "fill_container",
-                      "stroke": {
-                        "align": "outside",
-                        "thickness": {
-                          "bottom": 1
-                        },
-                        "fill": "#282828ff"
+                      "stroke": "#282828ff",
+                      "strokeWidth": {
+                        "bottom": 1
                       },
+                      "strokeAlignment": "outer",
                       "padding": [
                         10,
                         0,
@@ -1142,13 +1120,11 @@
                       "id": "UzkUc",
                       "name": "expRow3",
                       "width": "fill_container",
-                      "stroke": {
-                        "align": "outside",
-                        "thickness": {
-                          "bottom": 1
-                        },
-                        "fill": "#282828ff"
+                      "stroke": "#282828ff",
+                      "strokeWidth": {
+                        "bottom": 1
                       },
+                      "strokeAlignment": "outer",
                       "padding": [
                         10,
                         0,
@@ -1770,10 +1746,9 @@
                       "id": "Rkvxi",
                       "name": "contactBtn",
                       "cornerRadius": 100,
-                      "stroke": {
-                        "thickness": 1,
-                        "fill": "#ffffff1a"
-                      },
+                      "stroke": "#ffffff1a",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
                       "padding": [
                         8,
                         22
@@ -1796,10 +1771,9 @@
                       "id": "4beNg",
                       "name": "emailBtn",
                       "cornerRadius": 100,
-                      "stroke": {
-                        "thickness": 1,
-                        "fill": "#ffffff1a"
-                      },
+                      "stroke": "#ffffff1a",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
                       "padding": [
                         8,
                         22
@@ -1833,10 +1807,9 @@
       "name": "badgeWrapper",
       "fill": "#3b82f614",
       "cornerRadius": 100,
-      "stroke": {
-        "thickness": 1,
-        "fill": "#3b82f638"
-      },
+      "stroke": "#3b82f638",
+      "strokeWidth": 1,
+      "strokeAlignment": "inner",
       "gap": 5,
       "padding": [
         3,
@@ -1864,5 +1837,6 @@
         }
       ]
     }
-  ]
+  ],
+  "fileToken": "b17d8c92-9c80-4f04-b8aa-0423c30ed64c"
 }
